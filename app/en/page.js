@@ -146,7 +146,7 @@ export default async function EnglishHome() {
       {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
       <LangSetter />
       <GoogleAnalytics measurementId={settings.ga_measurement_id} />
-      <TickerBar text={settings.ticker_text} />
+      <TickerBar text={settings.ticker_text_en} />
 
       {/* Header */}
       <header className="relative border-b border-gray-200 bg-white/95 backdrop-blur-md sticky top-0 z-50 shadow-md">
@@ -540,7 +540,7 @@ export default async function EnglishHome() {
       >
         <i className="fa-brands fa-whatsapp" />
       </a>
-      <BackToTop />
+      <BackToTop side="left" />
     </main>
   );
-}
+    }
