@@ -690,6 +690,7 @@ function SettingsTab({ settings, setSettings }) {
     ga_measurement_id: settings.ga_measurement_id || '',
     search_console_verification: settings.search_console_verification || '',
     ticker_text: settings.ticker_text || '',
+    ticker_text_en: settings.ticker_text_en || '',
   });
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -732,7 +733,8 @@ function SettingsTab({ settings, setSettings }) {
 
       <div className="premium-card-bg border border-gray-200 rounded-2xl p-6 space-y-4">
         <h2 className="text-gray-900 font-bold">الشريط المتحرك أعلى الموقع</h2>
-        <Field label="النص المتحرك" value={form.ticker_text} onChange={(v) => setForm({ ...form, ticker_text: v })} textarea rows={2} />
+        <Field label="النص المتحرك (النسخة العربية)" value={form.ticker_text} onChange={(v) => setForm({ ...form, ticker_text: v })} textarea rows={2} />
+        <Field label="النص المتحرك (English Version)" value={form.ticker_text_en} onChange={(v) => setForm({ ...form, ticker_text_en: v })} textarea rows={2} />
       </div>
 
       {saved && <p className="text-emerald-600 text-xs">تم الحفظ بنجاح</p>}
@@ -797,4 +799,4 @@ function SecurityTab() {
       </div>
     </div>
   );
-}
+    }
