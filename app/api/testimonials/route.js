@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/session';
-import { getTestimonials, getAllTestimonialsAdmin, addTestimonial, deleteTestimonial, approveTestimonial, ensureSchema } from '@/lib/db';
+import { getTestimonials, getAllTestimonialsAdmin, addTestimonial, deleteTestimonial, approveTestimonial, updateTestimonialAdmin, ensureSchema } from '@/lib/db';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -36,9 +36,13 @@ export async function PUT(request) {
   if (!session.isLoggedIn) {
     return NextResponse.json({ error: 'غير مصرح' }, { status: 401 });
   }
-  const { id, approved } = await request.json();
-  await approveTestimonial(id, approved);
-  return NextResponse.json({ ok: true });
+  const body = await request.json();
+  if (body.approvalOnly) {
+    await approveTestimonial(body.id, body.approved);
+    return NextResponse.json({ ok: true });
+  }
+  const item = await updateTestimonialAdmin(body.id, body);
+  return NextResponse.json({ item });
 }
 
 export async function DELETE(request) {
