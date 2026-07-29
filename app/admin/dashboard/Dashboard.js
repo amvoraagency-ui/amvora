@@ -34,9 +34,14 @@ export default function Dashboard({ initialPortfolio, initialTestimonials, initi
       <div className="max-w-5xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-xl sm:text-2xl font-black text-gray-900">لوحة تحكم Amvora</h1>
-          <button onClick={logout} className="text-xs sm:text-sm text-gray-500 hover:text-red-600 border border-gray-300 rounded-lg px-4 py-2">
-            تسجيل الخروج
-          </button>
+          <div className="flex items-center gap-2">
+            <a href="/" target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-gray-500 hover:text-gold border border-gray-300 rounded-lg px-4 py-2 flex items-center gap-2">
+              <i className="fa-solid fa-arrow-up-right-from-square" /> شاهد الموقع
+            </a>
+            <button onClick={logout} className="text-xs sm:text-sm text-gray-500 hover:text-red-600 border border-gray-300 rounded-lg px-4 py-2">
+              تسجيل الخروج
+            </button>
+          </div>
         </div>
 
         {dbError && <div className="bg-red-50 border border-red-300 text-red-700 text-sm rounded-xl p-4 mb-8">{dbError}</div>}
@@ -299,28 +304,46 @@ function PortfolioTab({ items, setItems }) {
 function TestimonialsTab({ items, setItems }) {
   const emptyForm = { name: '', role: '', quote: '', rating: 5 };
   const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  async function addItem(e) {
+  async function submit(e) {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const res = await fetch('/api/testimonials', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'فشل الحفظ');
-      setItems([data.item, ...items]);
+      if (editingId) {
+        const res = await fetch('/api/testimonials', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: editingId, ...form, keepApproval: true }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'فشل الحفظ');
+        setItems(items.map((i) => (i.id === editingId ? data.item : i)));
+      } else {
+        const res = await fetch('/api/testimonials', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'فشل الحفظ');
+        setItems([data.item, ...items]);
+      }
       setForm(emptyForm);
+      setEditingId(null);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
+  }
+
+  function edit(item) {
+    setEditingId(item.id);
+    setForm({ name: item.name, role: item.role || '', quote: item.quote, rating: item.rating || 5 });
   }
 
   async function removeItem(id) {
@@ -330,7 +353,7 @@ function TestimonialsTab({ items, setItems }) {
   }
 
   async function setApproved(id, approved) {
-    await fetch('/api/testimonials', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, approved }) });
+    await fetch('/api/testimonials', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, approved, approvalOnly: true }) });
     setItems(items.map((i) => (i.id === id ? { ...i, approved } : i)));
   }
 
@@ -340,8 +363,8 @@ function TestimonialsTab({ items, setItems }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <div className="premium-card-bg border border-gray-200 rounded-2xl p-6">
-        <h2 className="text-gray-900 font-bold mb-4">إضافة رأي عميل يدوياً</h2>
-        <form onSubmit={addItem} className="space-y-3">
+        <h2 className="text-gray-900 font-bold mb-4">{editingId ? 'تعديل رأي عميل' : 'إضافة رأي عميل يدوياً'}</h2>
+        <form onSubmit={submit} className="space-y-3">
           <input required placeholder="اسم العميل" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" />
           <input placeholder="الصفة" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" />
           <textarea required placeholder="نص الرأي" rows="3" value={form.quote} onChange={(e) => setForm({ ...form, quote: e.target.value })} className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" />
@@ -349,10 +372,13 @@ function TestimonialsTab({ items, setItems }) {
             {[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} نجوم</option>)}
           </select>
           {error && <p className="text-red-600 text-xs">{error}</p>}
-          <button disabled={loading} className="w-full gold-bg-gradient text-black font-bold py-2 rounded-lg disabled:opacity-50">
-            {loading ? 'جارٍ الحفظ...' : 'إضافة'}
-          </button>
-          <p className="text-gray-400 text-xs">الآراء اللي تضيفها إنت من هنا بتظهر فوراً من غير مراجعة.</p>
+          <div className="flex gap-2">
+            <button disabled={loading} className="flex-1 gold-bg-gradient text-black font-bold py-2 rounded-lg disabled:opacity-50">
+              {loading ? 'جارٍ الحفظ...' : editingId ? 'حفظ التعديل' : 'إضافة'}
+            </button>
+            {editingId && <button type="button" onClick={() => { setEditingId(null); setForm(emptyForm); }} className="px-4 text-gray-500 text-sm">إلغاء</button>}
+          </div>
+          {!editingId && <p className="text-gray-400 text-xs">الآراء اللي تضيفها إنت من هنا بتظهر فوراً من غير مراجعة.</p>}
         </form>
       </div>
 
@@ -369,6 +395,7 @@ function TestimonialsTab({ items, setItems }) {
                   <p className="text-gray-600 text-xs mt-1">{item.quote}</p>
                   <div className="flex gap-3 mt-3 text-xs">
                     <button onClick={() => setApproved(item.id, true)} className="text-emerald-700 font-bold hover:underline">✓ موافقة ونشر</button>
+                    <button onClick={() => edit(item)} className="text-gray-600 font-bold hover:underline">✎ تعديل</button>
                     <button onClick={() => removeItem(item.id)} className="text-red-600 font-bold hover:underline">✕ رفض وحذف</button>
                   </div>
                 </div>
@@ -389,6 +416,7 @@ function TestimonialsTab({ items, setItems }) {
                 </div>
                 <div className="flex flex-col gap-2 shrink-0 text-xs">
                   <button onClick={() => setApproved(item.id, false)} className="text-amber-700 hover:underline">إخفاء</button>
+                  <button onClick={() => edit(item)} className="text-gray-600 hover:underline">تعديل</button>
                   <button onClick={() => removeItem(item.id)} className="text-red-600 hover:underline">حذف</button>
                 </div>
               </div>
@@ -799,4 +827,4 @@ function SecurityTab() {
       </div>
     </div>
   );
-    }
+          }
