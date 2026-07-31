@@ -1,5 +1,6 @@
 import './globals.css';
 import { getSettings } from '@/lib/db';
+import { Analytics } from '@vercel/analytics/next';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://amvora.vercel.app';
 
@@ -72,6 +73,7 @@ export default function RootLayout({ children }) {
           تخطَّ إلى المحتوى الرئيسي
         </a>
         {children}
+        <Analytics />
       </body>
     </html>
   );
