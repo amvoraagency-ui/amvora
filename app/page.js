@@ -15,6 +15,7 @@ import MobileNav, { DesktopNav } from '@/components/Nav';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import BackToTop from '@/components/BackToTop';
 import LangSwitchLink from '@/components/LangSwitchLink';
+import PortfolioGrid from '@/components/PortfolioGrid';
 
 export const dynamic = 'force-dynamic';
 
@@ -269,41 +270,7 @@ export default async function Home() {
           <span className="text-gold font-bold text-xs sm:text-sm uppercase tracking-wider block mb-2 font-mono">// OUR WORK</span>
           <h2 className="text-2xl md:text-5xl font-black text-gray-900 mb-4">أعمالنا</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {portfolioItems.length === 0 && (
-            <div className="premium-card-bg border border-dashed border-gray-300 rounded-3xl p-8 sm:p-10 flex flex-col items-center justify-center text-center min-h-[280px] md:col-span-3">
-              <i className="fa-solid fa-hourglass-half text-3xl text-gold/60 mb-4" />
-              <h3 className="text-gray-900 font-bold text-lg mb-2">مشروعك القادم هنا</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">نحن حالياً بصدد تسليم مجموعة من المشاريع، وسيتم إضافتها هنا فور اكتمالها.</p>
-            </div>
-          )}
-          {portfolioItems.map((item, idx) => (
-            <Reveal key={item.id} delay={Math.min(idx, 5) * 80}>
-            <div className="premium-card-bg border border-gray-200 rounded-3xl overflow-hidden hover:border-gold/50 transition-all shadow-lg relative h-full hover-lift">
-              {item.pinned && (
-                <span className="absolute top-3 left-3 bg-gold text-black text-[10px] font-black px-2 py-1 rounded-full z-10">
-                  <i className="fa-solid fa-thumbtack ml-1" /> مميز
-                </span>
-              )}
-              {item.image_url && (
-                <div className="relative w-full h-48">
-                  <Image src={item.image_url} alt={item.title} fill className="object-cover" />
-                </div>
-              )}
-              <div className="p-6">
-                {item.tag && <span className="text-xs text-gold font-bold uppercase tracking-wider font-mono">{item.tag}</span>}
-                <h3 className="text-gray-900 font-black text-lg mt-2 mb-2">{item.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
-                {item.link_url && (
-                  <a href={item.link_url} target="_blank" rel="noopener noreferrer" className="inline-block mt-4 text-[#8a6d1f] text-sm font-bold hover:underline">
-                    زيارة المشروع →
-                  </a>
-                )}
-              </div>
-            </div>
-            </Reveal>
-          ))}
-        </div>
+        <PortfolioGrid items={portfolioItems} locale="ar" />
       </section>
 
       {/* Testimonials (Social proof) */}
@@ -347,6 +314,40 @@ export default async function Home() {
           </Reveal>
         </div>
       </section>
+
+      {/* Stats - only shows once real numbers are filled in from the dashboard */}
+      {(settings.stat_projects || settings.stat_years || settings.stat_satisfaction || settings.stat_support) && (
+        <section className="py-12 sm:py-16 bg-[#efe8d8] border-y border-gray-200">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-center">
+              {settings.stat_projects && (
+                <div>
+                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_projects}</div>
+                  <div className="text-gray-600 text-xs sm:text-sm mt-2 font-bold">مشروع مُسلَّم</div>
+                </div>
+              )}
+              {settings.stat_years && (
+                <div>
+                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_years}</div>
+                  <div className="text-gray-600 text-xs sm:text-sm mt-2 font-bold">سنوات خبرة</div>
+                </div>
+              )}
+              {settings.stat_satisfaction && (
+                <div>
+                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_satisfaction}</div>
+                  <div className="text-gray-600 text-xs sm:text-sm mt-2 font-bold">رضا العملاء</div>
+                </div>
+              )}
+              {settings.stat_support && (
+                <div>
+                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_support}</div>
+                  <div className="text-gray-600 text-xs sm:text-sm mt-2 font-bold">دعم فني</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* VIP Club */}
       <section className="py-16 sm:py-20 max-w-5xl mx-auto px-4 sm:px-6">
@@ -460,6 +461,7 @@ export default async function Home() {
               <li><a href="#about" className="hover:text-[#8a6d1f]">من نحن</a></li>
               <li><a href="#pricing" className="hover:text-[#8a6d1f]">الباقات</a></li>
               <li><a href="#faq" className="hover:text-[#8a6d1f]">الأسئلة الشائعة</a></li>
+              <li><a href="/blog" className="hover:text-[#8a6d1f]">المدونة</a></li>
             </ul>
           </div>
           <div>

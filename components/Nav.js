@@ -10,6 +10,7 @@ const LINKS = {
     { href: '#about', label: 'من نحن' },
     { href: '#pricing', label: 'الباقات' },
     { href: '#faq', label: 'الأسئلة الشائعة' },
+    { href: '/blog', label: 'المدونة' },
     { href: '#contact-section', label: 'تواصل معنا' },
   ],
   en: [
@@ -20,6 +21,7 @@ const LINKS = {
     { href: '#about', label: 'About' },
     { href: '#pricing', label: 'Pricing' },
     { href: '#faq', label: 'FAQ' },
+    { href: '/en/blog', label: 'Blog' },
     { href: '#contact-section', label: 'Contact' },
   ],
 };

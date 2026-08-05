@@ -9,6 +9,7 @@ const TABS = [
   { id: 'portfolio', label: 'أعمالنا' },
   { id: 'testimonials', label: 'آراء العملاء' },
   { id: 'faqs', label: 'الأسئلة الشائعة' },
+  { id: 'blog', label: 'المدونة' },
   { id: 'hero', label: 'صور الغلاف' },
   { id: 'settings', label: 'الإعدادات' },
   { id: 'security', label: 'الأمان' },
@@ -65,6 +66,7 @@ export default function Dashboard({ initialPortfolio, initialTestimonials, initi
         {tab === 'portfolio' && <PortfolioTab items={portfolio} setItems={setPortfolio} />}
         {tab === 'testimonials' && <TestimonialsTab items={testimonials} setItems={setTestimonials} />}
         {tab === 'faqs' && <FaqsTab items={faqs} setItems={setFaqs} />}
+        {tab === 'blog' && <BlogTab />}
         {tab === 'hero' && <HeroTab items={heroSlides} setItems={setHeroSlides} />}
         {tab === 'settings' && <SettingsTab settings={settings} setSettings={setSettings} />}
         {tab === 'security' && <SecurityTab />}
@@ -507,6 +509,121 @@ function FaqsTab({ items, setItems }) {
 }
 
 /* ============ Hero Slides Tab ============ */
+/* ============ Blog Tab ============ */
+function BlogTab() {
+  const [locale, setLocale] = useState('ar');
+  const [items, setItems] = useState([]);
+  const [loaded, setLoaded] = useState(false);
+  const emptyForm = { title: '', excerpt: '', content: '', cover_image: '', slug: '', published: true };
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  async function loadAll() {
+    setLoaded(false);
+    const res = await fetch('/api/blog?all=1');
+    const data = await res.json();
+    setItems(data.items || []);
+    setLoaded(true);
+  }
+
+  useEffect(() => { loadAll(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const visibleItems = items.filter((i) => (i.locale || 'ar') === locale);
+
+  async function submit(e) {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      if (editingId) {
+        const res = await fetch('/api/blog', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: editingId, ...form }) });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'فشل الحفظ');
+        setItems(items.map((i) => (i.id === editingId ? data.item : i)));
+      } else {
+        const res = await fetch('/api/blog', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, locale }) });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'فشل الحفظ');
+        setItems([data.item, ...items]);
+      }
+      setForm(emptyForm);
+      setEditingId(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function edit(item) {
+    setEditingId(item.id);
+    setLocale(item.locale || 'ar');
+    setForm({ title: item.title, excerpt: item.excerpt || '', content: item.content, cover_image: item.cover_image || '', slug: item.slug, published: item.published !== false });
+  }
+
+  async function removeItem(id) {
+    if (!confirm('حذف هذا المقال نهائياً؟')) return;
+    await fetch('/api/blog', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+    setItems(items.filter((i) => i.id !== id));
+  }
+
+  return (
+    <div>
+      <div className="flex gap-2 mb-6">
+        <button onClick={() => { setLocale('ar'); setEditingId(null); setForm(emptyForm); }} className={`px-4 py-2 text-xs font-bold rounded-lg border ${locale === 'ar' ? 'bg-gray-900 text-white border-gray-900' : 'border-gray-300 text-gray-600'}`}>
+          🇪🇬 النسخة العربية
+        </button>
+        <button onClick={() => { setLocale('en'); setEditingId(null); setForm(emptyForm); }} className={`px-4 py-2 text-xs font-bold rounded-lg border ${locale === 'en' ? 'bg-gray-900 text-white border-gray-900' : 'border-gray-300 text-gray-600'}`}>
+          🌐 English Version
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="premium-card-bg border border-gray-200 rounded-2xl p-6">
+          <h2 className="text-gray-900 font-bold mb-4">{editingId ? 'تعديل مقال' : 'كتابة مقال جديد'}</h2>
+          <form onSubmit={submit} className="space-y-3">
+            <input required placeholder="عنوان المقال" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" />
+            <input placeholder="رابط مخصص (اختياري - هيتولد تلقائياً من العنوان لو فاضي)" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" />
+            <textarea placeholder="ملخص قصير يظهر في صفحة كل المقالات (اختياري)" rows="2" value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" />
+            <ImageUploadField label="صورة الغلاف (اختياري)" value={form.cover_image} onChange={(v) => setForm({ ...form, cover_image: v })} />
+            <textarea required placeholder="محتوى المقال - افصل بين الفقرات بسطر جديد" rows="10" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" />
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} />
+              منشور (ظاهر للزوار)
+            </label>
+            {error && <p className="text-red-600 text-xs">{error}</p>}
+            <div className="flex gap-2">
+              <button disabled={loading} className="flex-1 gold-bg-gradient text-black font-bold py-2 rounded-lg disabled:opacity-50">
+                {loading ? 'جارٍ الحفظ...' : editingId ? 'حفظ التعديل' : 'نشر المقال'}
+              </button>
+              {editingId && <button type="button" onClick={() => { setEditingId(null); setForm(emptyForm); }} className="px-4 text-gray-500 text-sm">إلغاء</button>}
+            </div>
+          </form>
+        </div>
+
+        <div className="space-y-3">
+          {!loaded && <p className="text-gray-400 text-sm">جارٍ التحميل...</p>}
+          {loaded && visibleItems.length === 0 && <p className="text-gray-400 text-sm">لا توجد مقالات بهذه اللغة بعد.</p>}
+          {visibleItems.map((item) => (
+            <div key={item.id} className="premium-card-bg border border-gray-200 rounded-xl p-4 flex justify-between items-start gap-3">
+              <div>
+                <p className="text-gray-900 font-bold text-sm">{item.title} {!item.published && <span className="text-amber-600 text-xs">(مسودة)</span>}</p>
+                <p className="text-gray-500 text-xs mt-1">{item.excerpt || item.content.slice(0, 80)}</p>
+              </div>
+              <div className="flex flex-col gap-2 shrink-0 text-xs">
+                <button onClick={() => edit(item)} className="text-gray-600 hover:underline">تعديل</button>
+                <button onClick={() => removeItem(item.id)} className="text-red-600 hover:underline">حذف</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function HeroTab({ items, setItems }) {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
@@ -720,6 +837,10 @@ function SettingsTab({ settings, setSettings }) {
     privacy_updated_ar: settings.privacy_updated_ar || '',
     privacy_updated_en: settings.privacy_updated_en || '',
     calendly_url: settings.calendly_url || '',
+    stat_projects: settings.stat_projects || '',
+    stat_years: settings.stat_years || '',
+    stat_satisfaction: settings.stat_satisfaction || '',
+    stat_support: settings.stat_support || '',
     ticker_text: settings.ticker_text || '',
     ticker_text_en: settings.ticker_text_en || '',
   });
@@ -766,6 +887,15 @@ function SettingsTab({ settings, setSettings }) {
         <h2 className="text-gray-900 font-bold">الشريط المتحرك أعلى الموقع</h2>
         <Field label="النص المتحرك (النسخة العربية)" value={form.ticker_text} onChange={(v) => setForm({ ...form, ticker_text: v })} textarea rows={2} />
         <Field label="النص المتحرك (English Version)" value={form.ticker_text_en} onChange={(v) => setForm({ ...form, ticker_text_en: v })} textarea rows={2} />
+      </div>
+
+      <div className="premium-card-bg border border-gray-200 rounded-2xl p-6 space-y-4">
+        <h2 className="text-gray-900 font-bold">قسم الأرقام والإنجازات</h2>
+        <p className="text-amber-700 text-xs bg-amber-50 border border-amber-300 rounded-lg p-3">⚠️ القسم ده مختفي تماماً من الموقع لحد ما تملا رقم واحد على الأقل هنا. متحطش غير أرقام حقيقية.</p>
+        <Field label="عدد المشاريع (مثال: 12+)" value={form.stat_projects} onChange={(v) => setForm({ ...form, stat_projects: v })} />
+        <Field label="سنوات الخبرة (مثال: 2)" value={form.stat_years} onChange={(v) => setForm({ ...form, stat_years: v })} />
+        <Field label="نسبة رضا العملاء (مثال: 95%)" value={form.stat_satisfaction} onChange={(v) => setForm({ ...form, stat_satisfaction: v })} />
+        <Field label="الدعم الفني (مثال: 24/7)" value={form.stat_support} onChange={(v) => setForm({ ...form, stat_support: v })} />
       </div>
 
       <div className="premium-card-bg border border-gray-200 rounded-2xl p-6 space-y-4">

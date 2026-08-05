@@ -3,6 +3,7 @@ import Reveal from '@/components/Reveal';
 import LangSetter from '@/components/LangSetter';
 import MobileNav, { DesktopNav } from '@/components/Nav';
 import LangSwitchLink from '@/components/LangSwitchLink';
+import PortfolioGrid from '@/components/PortfolioGrid';
 import {
   getPortfolioItems,
   getTestimonials,
@@ -316,41 +317,7 @@ export default async function EnglishHome() {
           <span className="text-gold font-bold text-xs sm:text-sm uppercase tracking-wider block mb-2 font-mono">// OUR WORK</span>
           <h2 className="text-2xl md:text-5xl font-black text-gray-900 mb-4">Selected Work</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {portfolioItems.length === 0 && (
-            <div className="premium-card-bg border border-dashed border-gray-300 rounded-3xl p-8 sm:p-10 flex flex-col items-center justify-center text-center min-h-[280px] md:col-span-3">
-              <i className="fa-solid fa-hourglass-half text-3xl text-gold/60 mb-4" />
-              <h3 className="text-gray-900 font-bold text-lg mb-2">Your project could be here</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">We&apos;re currently delivering a set of projects, and they&apos;ll be added here as soon as they&apos;re complete.</p>
-            </div>
-          )}
-          {portfolioItems.map((item, idx) => (
-            <Reveal key={item.id} delay={Math.min(idx, 5) * 80}>
-              <div className="premium-card-bg border border-gray-200 rounded-3xl overflow-hidden hover:border-gold/50 transition-all shadow-lg relative h-full hover-lift">
-                {item.pinned && (
-                  <span className="absolute top-3 right-3 bg-gold text-black text-[10px] font-black px-2 py-1 rounded-full z-10">
-                    <i className="fa-solid fa-thumbtack mr-1" /> Featured
-                  </span>
-                )}
-                {item.image_url && (
-                  <div className="relative w-full h-48">
-                    <Image src={item.image_url} alt={item.title} fill className="object-cover" />
-                  </div>
-                )}
-                <div className="p-6">
-                  {item.tag && <span className="text-xs text-gold font-bold uppercase tracking-wider font-mono">{item.tag}</span>}
-                  <h3 className="text-gray-900 font-black text-lg mt-2 mb-2">{item.title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
-                  {item.link_url && (
-                    <a href={item.link_url} target="_blank" rel="noopener noreferrer" className="inline-block mt-4 text-[#8a6d1f] text-sm font-bold hover:underline">
-                      Visit project →
-                    </a>
-                  )}
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        <PortfolioGrid items={portfolioItems} locale="en" />
       </section>
 
       {/* Testimonials */}
@@ -398,6 +365,40 @@ export default async function EnglishHome() {
           </Reveal>
         </div>
       </section>
+
+      {/* Stats - only shows once real numbers are filled in from the dashboard */}
+      {(settings.stat_projects || settings.stat_years || settings.stat_satisfaction || settings.stat_support) && (
+        <section className="py-12 sm:py-16 bg-[#efe8d8] border-y border-gray-200">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-center">
+              {settings.stat_projects && (
+                <div>
+                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_projects}</div>
+                  <div className="text-gray-600 text-xs sm:text-sm mt-2 font-bold">Projects Delivered</div>
+                </div>
+              )}
+              {settings.stat_years && (
+                <div>
+                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_years}</div>
+                  <div className="text-gray-600 text-xs sm:text-sm mt-2 font-bold">Years of Experience</div>
+                </div>
+              )}
+              {settings.stat_satisfaction && (
+                <div>
+                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_satisfaction}</div>
+                  <div className="text-gray-600 text-xs sm:text-sm mt-2 font-bold">Client Satisfaction</div>
+                </div>
+              )}
+              {settings.stat_support && (
+                <div>
+                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_support}</div>
+                  <div className="text-gray-600 text-xs sm:text-sm mt-2 font-bold">Technical Support</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* VIP Club */}
       <section className="py-16 sm:py-20 max-w-5xl mx-auto px-4 sm:px-6">
@@ -507,6 +508,7 @@ export default async function EnglishHome() {
               <li><a href="#about" className="hover:text-[#8a6d1f]">About</a></li>
               <li><a href="#pricing" className="hover:text-[#8a6d1f]">Pricing</a></li>
               <li><a href="#faq" className="hover:text-[#8a6d1f]">FAQ</a></li>
+              <li><a href="/en/blog" className="hover:text-[#8a6d1f]">Blog</a></li>
             </ul>
           </div>
           <div>
