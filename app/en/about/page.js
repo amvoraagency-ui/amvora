@@ -2,6 +2,7 @@ import Reveal from '@/components/Reveal';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import BackToTop from '@/components/BackToTop';
+import WaveDivider from '@/components/WaveDivider';
 import { fetchSiteContent } from '@/lib/content';
 
 export const dynamic = 'force-dynamic';
@@ -39,7 +40,8 @@ export default async function AboutPageEn() {
         </Reveal>
       </section>
 
-      <section className="py-16 sm:py-24 bg-[#efe8d8] border-y border-gray-200">
+      <WaveDivider fromColor="#ffffff" toColor="#efe8d8" />
+      <section className="py-16 sm:py-24 bg-[#efe8d8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16 sm:mb-20">
             <span className="text-gold font-bold text-xs sm:text-sm uppercase tracking-wider block mb-2 font-mono">// THE REALITY MATRIX</span>
@@ -71,6 +73,8 @@ export default async function AboutPageEn() {
           </div>
         </div>
       </section>
+
+      <WaveDivider fromColor="#efe8d8" toColor="#ffffff" flip />
 
       <section className="py-16 sm:py-20 max-w-3xl mx-auto px-4 sm:px-6 text-center">
         <h2 className="text-xl sm:text-3xl font-black text-gray-900 mb-4">Ready to start your project with us?</h2>

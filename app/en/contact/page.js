@@ -1,6 +1,7 @@
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import BackToTop from '@/components/BackToTop';
+import WaveDivider from '@/components/WaveDivider';
 import ConsultationCTA from '@/components/ConsultationCTA';
 import { fetchSiteContent } from '@/lib/content';
 
@@ -53,7 +54,8 @@ export default async function ContactPageEn() {
         </div>
       </section>
 
-      <section className="py-16 sm:py-24 bg-[#efe8d8] border-y border-gray-200">
+      <WaveDivider fromColor="#ffffff" toColor="#efe8d8" />
+      <section className="py-16 sm:py-24 bg-[#efe8d8]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-16">
             <span className="text-gold font-bold text-xs sm:text-sm uppercase tracking-wider block mb-2 font-mono">// FAQ</span>
@@ -73,6 +75,8 @@ export default async function ContactPageEn() {
           </div>
         </div>
       </section>
+
+      <WaveDivider fromColor="#efe8d8" toColor="#ffffff" flip />
 
       <SiteFooter locale="en" settings={settings} wa={wa} />
       <a href={wa} target="_blank" rel="noopener noreferrer" aria-label="Contact us on WhatsApp" className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-[#25D366] text-white shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform focus-visible:ring-4 focus-visible:ring-[#25D366]/50 focus-visible:outline-none">
