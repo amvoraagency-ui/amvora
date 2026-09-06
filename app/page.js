@@ -1,82 +1,21 @@
-import Image from 'next/image';
 import Reveal from '@/components/Reveal';
-import {
-  getPortfolioItems,
-  getTestimonials,
-  getSettings,
-  getFaqs,
-  getHeroSlides,
-  getContentBlocks,
-} from '@/lib/db';
 import TickerBar from '@/components/TickerBar';
 import HeroCarousel from '@/components/HeroCarousel';
 import TestimonialsSection from '@/components/TestimonialsSection';
-import MobileNav, { DesktopNav } from '@/components/Nav';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import BackToTop from '@/components/BackToTop';
-import LangSwitchLink from '@/components/LangSwitchLink';
 import PortfolioGrid from '@/components/PortfolioGrid';
+import ImageMarquee from '@/components/ImageMarquee';
+import SiteHeader from '@/components/SiteHeader';
+import SiteFooter from '@/components/SiteFooter';
+import ConsultationCTA from '@/components/ConsultationCTA';
+import WaveDivider from '@/components/WaveDivider';
+import { fetchSiteContent } from '@/lib/content';
 
 export const dynamic = 'force-dynamic';
 
-async function safe(fn, fallback) {
-  try {
-    return await fn();
-  } catch {
-    return fallback;
-  }
-}
-
-const DEFAULT_REALITY = [
-  { icon: 'fa-city', title: 'في قطاع العقارات والإنشاءات:', body: 'الاعتماد على نصوص عشوائية دون إبراز للمشاريع بشكل منظم برمجياً، مما يجعل واجهة الموقع تبدو غير احترافية ولا تعكس جودة عمل الشركة على أرض الواقع.', body2: 'نهندس واجهات رقمية مخصصة تستعرض المشاريع الإنشائية بانسيابية فنية عالية، مما يعطي انطباعاً فورياً بالموثوقية العالية والجدية التقنية أمام العملاء والمستثمرين.' },
-  { icon: 'fa-bag-shopping', title: 'في قطاع المتاجر والبراندات:', body: 'موقع مثقل بقوالب برمجية تجارية مكررة وبطيئة التحميل، تؤدي إلى تشتيت الزوار وتقليل معدلات الشراء الفورية بسبب انعدام السلاسة الفنية.', body2: 'بناء برمجي مستقل وسريع يمنع ارتداد الزائر، مع تصميم واجهات تبرز المنتجات بشكل احترافي مريح لتجربة مستخدم متكاملة تزيد من استجابة العميل لإتمام الطلب.' },
-  { icon: 'fa-user-doctor', title: 'في المهن الحرة والاستشارية:', body: 'الاعتماد الكامل على صفحات التواصل الاجتماعي فقط، وهو ما يحد من مصداقيتك أمام عميل يبحث عنك بالاسم ولا يجد موقعاً رسمياً يوثّق خبرتك ومؤهلاتك.', body2: 'موقع تعريفي مخصص يعرض خبراتك ومؤهلاتك وأسلوب تواصلك بشكل منظم، ويكون أول ما يظهر لأي عميل يبحث عن اسمك أو تخصصك.' },
-];
-
-const DEFAULT_STRATEGIC_VALUE = [
-  { icon: 'fa-clock', title: 'متاح على مدار اليوم', body: 'موقعك الإلكتروني متاح على مدار الساعة، مما يسمح للعملاء المحتملين بالتعرف على خدماتك ومنتجاتك والوصول إليك في أي وقت ومن أي مكان.' },
-  { icon: 'fa-shield-heart', title: 'بناء الموثوقية والثقة', body: 'يمنح الموقع المحترف والمنظم انطباعاً إيجابياً وفخماً فورياً عن مؤسستك، مما يعزز من مصداقية عملك ويزيد من ثقة وولاء العملاء بك.' },
-  { icon: 'fa-images', title: 'استعراض شامل وتفاعلي', body: 'يمكنك عرض باقة منتجاتك وخدماتك بكافة تفاصيلها الفنية بشكل منظم كلياً، مدعومة بالصور الحية ومقاطع الفيديو التوضيحية الجذابة.' },
-  { icon: 'fa-headset', title: 'قناة مركزية للدعم', body: 'يمكن استخدام منصتك الرقمية كقناة مباشرة وفعالة للرد على كافة استفسارات العملاء، وتلقي الطلبات، وتقديم الدعم الفني السريع بمرونة تامة.' },
-  { icon: 'fa-bullseye', title: 'قلب الاستراتيجية التسويقية', body: 'يعتبر الموقع الوجهة الأساسية التي يتم توجيه الزوار المهتمين والمستثمرين إليها من مختلف الحملات الإعلانية الممولة لتحويلهم إلى صفقات فعلية.' },
-  { icon: 'fa-cart-shopping', title: 'قناة بيع جديدة ومستمرة', body: 'يفتح المتجر الإلكتروني المخصص للبراند منافذ تعاقدات ومبيعات متجددة تعمل بكفاءة على مدار الساعة لضمان نمو واستدامة حركة التدفق النقدي.' },
-];
-
-const DEFAULT_SPECIALTIES = [
-  { icon: 'fa-city', title: 'الأبراج العقارية والإنشائية', body: 'نهندس لشركات التطوير العقاري والمقاولات واجهات رقمية تعكس جودة ومقاييس مشاريعكم على أرض الواقع، مع استعراض منظم للمشاريع ونماذج طلب استشارة مجهزة لاستقبال بيانات المهتمين بدقة.', tag: 'Real Estate & Towers //' },
-  { icon: 'fa-bag-shopping', title: 'المتاجر الإلكترونية المخصصة', body: 'نبني متاجر متكاملة تركز على سرعة التحميل والاستجابة لتقليل ارتداد الزوار، مقتدين بالمقاييس التقنية المعتمدة في كبرى المنصات العالمية لزيادة معدلات التحويل.', tag: 'High-Conversion E-Commerce //' },
-  { icon: 'fa-address-card', title: 'المواقع التعريفية للمهنيين وأصحاب الأعمال', body: 'مهما كان مجال عملك - طبيب، مهندس، مكتب استشاري، مطعم، كافيه، محل تجاري، أو حتى علامتك الشخصية - نصمم لك موقعاً تعريفياً احترافياً يعرض خبرتك وخدماتك بشكل منظم، ويكون أول ما يظهر لأي عميل يبحث عن اسمك أو تخصصك.', tag: 'Professional Profile Sites //' },
-  { icon: 'fa-code-branch', title: 'التكامل والربط البرمجي', body: 'نوفر تكاملاً برمجياً مخصصاً لربط بوابات الدفع والتقسيط الإقليمية مع إعداد متطور لأنظمة التتبع والتحليل الرقمي، لضمان دقة تدفق البيانات وثبات أداء المنصة.', tag: 'Custom API Integrations //' },
-  { icon: 'fa-bullhorn', title: 'إدارة وتسويق المحتوى', body: 'ندير صفحاتك على السوشيال ميديا (فيسبوك، إنستجرام) بمحتوى مخطط له استراتيجياً يعكس هوية علامتك التجارية، ويكمّل موقعك الإلكتروني بحضور رقمي متكامل بدل ما يفضل الموقع لوحده.', tag: 'Content & Social Media //' },
-];
-
-const DEFAULT_PROCESS = [
-  { title: 'استشارة مبدئية', body: 'نسمع فكرتك ومتطلبات مشروعك عبر الواتساب ونحدد الأنسب لك.' },
-  { title: 'تصميم وعرض', body: 'نجهز تصور مبدئي لشكل المنصة قبل البدء في البناء الفعلي.' },
-  { title: 'بناء وربط تقني', body: 'هندسة الكود، وربط بوابات الدفع وأدوات التحليل حسب مشروعك.' },
-  { title: 'تسليم ودعم فني', body: 'تسليم المنصة مع فترة دعم فني مكفولة للتأكد من استقرارها.' },
-];
-
 export default async function Home() {
-  const [portfolioItems, testimonialItems, settings, faqs, heroSlides, realityDb, strategicDb, specialtiesDb, processDb] = await Promise.all([
-    safe(getPortfolioItems, []),
-    safe(getTestimonials, []),
-    safe(getSettings, {}),
-    safe(() => getFaqs('ar'), []),
-    safe(getHeroSlides, []),
-    safe(() => getContentBlocks('reality'), []),
-    safe(() => getContentBlocks('strategic_value'), []),
-    safe(() => getContentBlocks('specialties'), []),
-    safe(() => getContentBlocks('process'), []),
-  ]);
-
-  const reality = realityDb.length > 0 ? realityDb : DEFAULT_REALITY;
-  const strategicValue = strategicDb.length > 0 ? strategicDb : DEFAULT_STRATEGIC_VALUE;
-  const specialties = specialtiesDb.length > 0 ? specialtiesDb : DEFAULT_SPECIALTIES;
-  const processSteps = processDb.length > 0 ? processDb : DEFAULT_PROCESS;
-
-  const waMessage = encodeURIComponent('مرحباً 👋، شايف موقع Amvora وحابب أستفسر عن خدماتكم.');
-  const wa = `https://wa.me/${settings.whatsapp_number || '201000446294'}?text=${waMessage}`;
+  const { portfolioItems, testimonialItems, settings, faqs, heroSlides, reality, specialties, pricingPlans, wa } = await fetchSiteContent('ar');
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://amvora.vercel.app';
   const sameAs = [settings.facebook_url, settings.instagram_url, settings.linkedin_url].filter(Boolean);
@@ -96,7 +35,7 @@ export default async function Home() {
   const faqSchema = faqs.length > 0 ? {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: faqs.map((f) => ({
+    mainEntity: faqs.slice(0, 5).map((f) => ({
       '@type': 'Question',
       name: f.question,
       acceptedAnswer: { '@type': 'Answer', text: f.answer },
@@ -109,37 +48,12 @@ export default async function Home() {
       {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
       <GoogleAnalytics measurementId={settings.ga_measurement_id} />
       <TickerBar text={settings.ticker_text} />
-
-      {/* Header */}
-      <header className="relative border-b border-gray-200 bg-white/95 backdrop-blur-md sticky top-0 z-50 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <Image
-              src="/logo.png"
-              alt="Amvora Logo"
-              width={56}
-              height={56}
-              className="w-11 h-11 sm:w-14 sm:h-14 object-contain rounded-full border border-[#c5a059]/40 shadow-lg bg-[#f6f1e6] p-1"
-            />
-            <span className="text-xl sm:text-2xl font-black tracking-wider text-gray-900 font-mono">
-              AMVORA<span className="text-gold">.</span>
-            </span>
-          </div>
-          <DesktopNav />
-          <div className="flex items-center gap-3">
-            <LangSwitchLink to="/en" label="EN" className="hidden sm:flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-gold border border-gray-200 rounded-lg px-3 py-2 transition-colors" />
-            <a href={wa} target="_blank" rel="noopener noreferrer" className="gold-bg-gradient hover:opacity-90 text-black font-black px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm transition-all shadow-lg flex items-center gap-2">
-              <i className="fa-brands fa-whatsapp" /> تواصل معنا
-            </a>
-            <MobileNav />
-          </div>
-        </div>
-      </header>
+      <SiteHeader locale="ar" wa={wa} />
 
       {/* Hero */}
       <section className="relative pt-16 pb-20 sm:pt-20 sm:pb-24 overflow-hidden bg-gradient-to-b from-[#fdf9ee] to-white">
-        <div className="absolute -top-20 -right-20 w-72 h-72 bg-gold/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+        <div className="absolute -top-20 -right-20 w-72 h-72 bg-gold/10 rounded-full blur-3xl pointer-events-none blob-float" aria-hidden="true" />
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-gold/10 rounded-full blur-3xl pointer-events-none blob-float" aria-hidden="true" style={{ animationDelay: '-6s' }} />
         <HeroCarousel slides={heroSlides} />
         <div className="max-w-5xl mx-auto text-center px-4 sm:px-6 relative z-10 pt-6 sm:pt-10">
           <Reveal>
@@ -150,7 +64,7 @@ export default async function Home() {
           <p className="text-base md:text-2xl text-gray-600 max-w-3xl mx-auto mb-3 leading-relaxed">{settings.hero_subtitle}</p>
           <p className="text-sm md:text-lg text-[#8a6d1f]/80 max-w-2xl mx-auto mb-10 sm:mb-12 leading-relaxed">{settings.hero_subtitle2}</p>
           <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
-            <a href={wa} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto gold-bg-gradient hover:opacity-90 text-black font-black text-lg sm:text-xl px-8 sm:px-10 py-4 sm:py-5 rounded-2xl transition-all shadow-2xl inline-flex items-center justify-center gap-3 active:scale-95 focus-visible:ring-4 focus-visible:ring-gold/50 focus-visible:outline-none">
+            <a href={wa} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto gold-bg-gradient hover:opacity-90 text-black font-black text-lg sm:text-xl px-8 sm:px-10 py-4 sm:py-5 rounded-2xl transition-all shadow-2xl inline-flex items-center justify-center gap-3 active:scale-95 focus-visible:ring-4 focus-visible:ring-gold/50 focus-visible:outline-none pulse-cta">
               ابدأ مراجعة متطلباتك عبر الواتساب
             </a>
             {settings.calendly_url && (
@@ -160,19 +74,93 @@ export default async function Home() {
             )}
           </div>
           <p className="text-xs sm:text-sm text-gray-400 mt-4">مراجعة أولية لمتطلباتك من غير أي التزام.</p>
+
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 mt-12 sm:mt-14">
+            {[
+              { icon: 'fa-code', label: 'كود مخصص 100%' },
+              { icon: 'fa-bolt', label: 'أداء وسرعة عالية' },
+              { icon: 'fa-shield-halved', label: 'أمان وحماية كاملة' },
+              { icon: 'fa-headset', label: 'دعم فني مستمر' },
+            ].map((f) => (
+              <div key={f.label} className="flex items-center gap-2 text-gray-500 text-xs sm:text-sm font-bold">
+                <span className="w-8 h-8 rounded-full bg-gold/10 text-[#8a6d1f] flex items-center justify-center text-sm shrink-0">
+                  <i className={`fa-solid ${f.icon}`} />
+                </span>
+                {f.label}
+              </div>
+            ))}
+          </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Moving strip */}
+      <ImageMarquee items={portfolioItems} locale="ar" />
+
+      {/* Stats - only shows once real numbers are filled in from the dashboard */}
+      {(settings.stat_projects || settings.stat_years || settings.stat_satisfaction || settings.stat_support) && (
+        <>
+        <WaveDivider fromColor="#ffffff" toColor="#0f1f3d" />
+        <section className="py-14 sm:py-20 navy-bg-gradient">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-center">
+              {settings.stat_projects && (
+                <div>
+                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_projects}</div>
+                  <div className="text-gray-300 text-xs sm:text-sm mt-2 font-bold">مشروع مُسلَّم</div>
+                </div>
+              )}
+              {settings.stat_years && (
+                <div>
+                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_years}</div>
+                  <div className="text-gray-300 text-xs sm:text-sm mt-2 font-bold">سنوات خبرة</div>
+                </div>
+              )}
+              {settings.stat_satisfaction && (
+                <div>
+                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_satisfaction}</div>
+                  <div className="text-gray-300 text-xs sm:text-sm mt-2 font-bold">رضا العملاء</div>
+                </div>
+              )}
+              {settings.stat_support && (
+                <div>
+                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_support}</div>
+                  <div className="text-gray-300 text-xs sm:text-sm mt-2 font-bold">دعم فني</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+        <WaveDivider fromColor="#0f1f3d" toColor="#ffffff" flip />
+        </>
+      )}
+
+      {/* About teaser */}
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <Reveal>
+          <div className="premium-card-bg border border-gray-200 rounded-3xl p-6 sm:p-10 md:p-12 shadow-lg text-center sm:text-right">
+            <span className="text-gold font-bold text-xs sm:text-sm uppercase tracking-wider block mb-3 font-mono">// من نحن</span>
+            <h2 className="text-2xl md:text-4xl font-black text-gray-900 mb-5">{settings.about_title}</h2>
+            <p className="text-gray-600 text-base sm:text-lg leading-relaxed mb-6">{settings.about_text1}</p>
+            <a href="/about" className="inline-flex items-center gap-2 text-[#8a6d1f] font-bold hover:underline">
+              اعرف أكتر عننا <i className="fa-solid fa-arrow-left" />
+            </a>
+          </div>
           </Reveal>
         </div>
       </section>
 
       {/* Reality Matrix (Problem) */}
-      <section className="py-16 sm:py-24 bg-[#efe8d8] border-y border-gray-200">
+      <WaveDivider fromColor="#ffffff" toColor="#efe8d8" />
+      <section className="py-16 sm:py-24 bg-[#efe8d8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-16 sm:mb-20">
             <span className="text-gold font-bold text-xs sm:text-sm uppercase tracking-wider block mb-2 font-mono">// THE REALITY MATRIX</span>
             <h2 className="text-2xl md:text-5xl font-black text-gray-900 mb-4">تشريح برمجي: الفرق بين المنصات الجاهزة والمخصصة</h2>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
-            <div className="premium-card-bg border-r-4 border-red-500 border-t border-l border-b border-gray-200 rounded-3xl p-6 sm:p-8 shadow-lg">
+            <div className="bg-white border-r-4 border-red-500 border-t border-l border-b border-gray-200 rounded-3xl p-6 sm:p-8 shadow-lg">
               <h3 className="text-xl sm:text-2xl font-black text-gray-900 mb-6">المنصات التجارية التقليدية</h3>
               <div className="space-y-6">
                 {reality.map((r) => (
@@ -183,7 +171,7 @@ export default async function Home() {
                 ))}
               </div>
             </div>
-            <div className="premium-card-bg border-r-4 border-emerald-500 border-t border-l border-b border-gray-200 rounded-3xl p-6 sm:p-8 shadow-lg glow-gold">
+            <div className="bg-white border-r-4 border-emerald-500 border-t border-l border-b border-gray-200 rounded-3xl p-6 sm:p-8 shadow-lg glow-gold">
               <h3 className="text-xl sm:text-2xl font-black gold-text-gradient mb-6">المنصات المهندسة خصيصاً (مع Amvora)</h3>
               <div className="space-y-6">
                 {reality.map((r) => (
@@ -198,83 +186,49 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Strategic Value (Why it matters) */}
-      <section className="py-16 sm:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-2xl md:text-5xl font-black text-gray-900 mb-4">ليه موقعك الإلكتروني أهم استثمار في نشاطك؟</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {strategicValue.map((v, idx) => (
-              <Reveal key={v.title} delay={idx * 80}>
-              <div className="premium-card-bg border border-gray-200 p-6 sm:p-8 rounded-3xl hover:border-gold/40 transition-all shadow-lg h-full hover-lift">
-                <div className="w-12 h-12 bg-gold/10 text-[#8a6d1f] rounded-xl flex items-center justify-center text-xl mb-6">
-                  <i className={`fa-solid ${v.icon}`} />
-                </div>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">{v.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{v.body}</p>
-              </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
+      <WaveDivider fromColor="#efe8d8" toColor="#ffffff" flip />
 
-      {/* Specialties (What we build) */}
-      <section id="services" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6">
+      {/* Services teaser */}
+      <section className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-16 sm:mb-20">
           <span className="text-gold font-bold text-xs sm:text-sm uppercase tracking-wider block mb-2 font-mono">// WHAT WE BUILD</span>
           <h2 className="text-2xl md:text-5xl font-black text-gray-900 mb-4">تخصصاتنا البرمجية</h2>
           <p className="text-gray-500 max-w-2xl mx-auto text-base sm:text-lg">من الأبراج العقارية للعيادات الطبية والمطاعم - كل نشاط له بنية رقمية تناسبه.</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-          {specialties.map((s, idx) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {specialties.slice(0, 3).map((s, idx) => (
             <Reveal key={s.title} delay={idx * 100}>
-            <div className="premium-card-bg border border-gray-200 p-6 sm:p-10 rounded-3xl hover:border-gold/60 transition-all glow-gold h-full hover-lift">
-              <div className="w-14 h-14 bg-gold/20 rounded-2xl flex items-center justify-center mb-8 text-[#8a6d1f]">
+            <div className="premium-card-bg border border-gray-200 p-6 sm:p-8 rounded-3xl hover:border-gold/60 transition-all glow-gold h-full hover-lift">
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${idx % 2 === 0 ? 'bg-gold/20 text-[#8a6d1f]' : 'bg-teal/15 text-teal'}`}>
                 <i className={`fa-solid ${s.icon} text-2xl`} />
               </div>
-              <h3 className="text-xl sm:text-2xl font-black text-gray-900 mb-4">{s.title}</h3>
-              <p className="text-gray-600 text-sm sm:text-base leading-relaxed">{s.body}</p>
-              <div className="mt-8 border-t border-gray-200 pt-6">
-                <span className="text-xs text-gold font-bold tracking-widest uppercase font-mono">{s.tag}</span>
-              </div>
+              <h3 className="text-lg sm:text-xl font-black text-gray-900 mb-3">{s.title}</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">{s.body}</p>
             </div>
             </Reveal>
           ))}
         </div>
-      </section>
-
-      {/* Process (How we work) */}
-      <section id="process" className="py-16 sm:py-24 max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-16 sm:mb-20">
-          <span className="text-gold font-bold text-xs sm:text-sm uppercase tracking-wider block mb-2 font-mono">// OUR PROCESS</span>
-          <h2 className="text-2xl md:text-5xl font-black text-gray-900 mb-4">إزاي بنشتغل معاك؟</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-          {processSteps.map((step, idx) => (
-            <Reveal key={step.id || idx} delay={idx * 100}>
-            <div className="premium-card-bg border border-gray-200 rounded-3xl p-6 sm:p-8 text-center h-full hover-lift">
-              <div className="w-12 h-12 mx-auto bg-gold/20 text-[#8a6d1f] rounded-2xl flex items-center justify-center text-lg font-black mb-5 font-mono">{String(idx + 1).padStart(2, '0')}</div>
-              <h3 className="text-gray-900 font-bold text-base sm:text-lg mb-2">{step.title}</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">{step.body}</p>
-            </div>
-            </Reveal>
-          ))}
+        <div className="text-center mt-12">
+          <a href="/services" className="inline-flex items-center gap-2 gold-bg-gradient text-black font-black px-6 sm:px-8 py-3 sm:py-4 rounded-xl hover-lift">
+            شاهد كل خدماتنا وطريقة شغلنا <i className="fa-solid fa-arrow-left" />
+          </a>
         </div>
       </section>
 
       {/* Portfolio (Proof) */}
-      <section id="portfolio" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-16 sm:mb-20">
-          <span className="text-gold font-bold text-xs sm:text-sm uppercase tracking-wider block mb-2 font-mono">// OUR WORK</span>
-          <h2 className="text-2xl md:text-5xl font-black text-gray-900 mb-4">أعمالنا</h2>
-        </div>
-        <PortfolioGrid items={portfolioItems} locale="ar" />
-      </section>
+      {portfolioItems.length > 0 && (
+        <section id="portfolio" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-16">
+            <span className="text-gold font-bold text-xs sm:text-sm uppercase tracking-wider block mb-2 font-mono">// OUR WORK</span>
+            <h2 className="text-2xl md:text-5xl font-black text-gray-900 mb-4">أعمالنا</h2>
+          </div>
+          <PortfolioGrid items={portfolioItems} locale="ar" limit={6} />
+        </section>
+      )}
 
       {/* Testimonials (Social proof) */}
-      <section id="testimonials" className="py-16 sm:py-24 bg-[#efe8d8] border-y border-gray-200">
+      <WaveDivider fromColor="#ffffff" toColor="#efe8d8" />
+      <section id="testimonials" className="py-16 sm:py-24 bg-[#efe8d8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 sm:mb-16">
             <span className="text-gold font-bold text-xs sm:text-sm uppercase tracking-wider block mb-2 font-mono">// PARTNER FEEDBACK</span>
@@ -301,115 +255,16 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* About (Humanize, now that trust is built) */}
-      <section id="about" className="py-16 sm:py-20 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <Reveal>
-          <div className="premium-card-bg border border-gray-200 rounded-3xl p-6 sm:p-10 md:p-12 shadow-lg">
-            <span className="text-gold font-bold text-xs sm:text-sm uppercase tracking-wider block mb-3 font-mono">// من نحن</span>
-            <h2 className="text-2xl md:text-4xl font-black text-gray-900 mb-5">{settings.about_title}</h2>
-            <p className="text-gray-600 text-base sm:text-lg leading-relaxed mb-4">{settings.about_text1}</p>
-            <p className="text-gray-600 text-base sm:text-lg leading-relaxed">{settings.about_text2}</p>
-          </div>
-          </Reveal>
-        </div>
-      </section>
+      <WaveDivider fromColor="#efe8d8" toColor="#ffffff" flip />
 
-      {/* Stats - only shows once real numbers are filled in from the dashboard */}
-      {(settings.stat_projects || settings.stat_years || settings.stat_satisfaction || settings.stat_support) && (
-        <section className="py-12 sm:py-16 bg-[#efe8d8] border-y border-gray-200">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-center">
-              {settings.stat_projects && (
-                <div>
-                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_projects}</div>
-                  <div className="text-gray-600 text-xs sm:text-sm mt-2 font-bold">مشروع مُسلَّم</div>
-                </div>
-              )}
-              {settings.stat_years && (
-                <div>
-                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_years}</div>
-                  <div className="text-gray-600 text-xs sm:text-sm mt-2 font-bold">سنوات خبرة</div>
-                </div>
-              )}
-              {settings.stat_satisfaction && (
-                <div>
-                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_satisfaction}</div>
-                  <div className="text-gray-600 text-xs sm:text-sm mt-2 font-bold">رضا العملاء</div>
-                </div>
-              )}
-              {settings.stat_support && (
-                <div>
-                  <div className="text-3xl sm:text-5xl font-black text-gold font-mono">{settings.stat_support}</div>
-                  <div className="text-gray-600 text-xs sm:text-sm mt-2 font-bold">دعم فني</div>
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* VIP Club */}
-      <section className="py-16 sm:py-20 max-w-5xl mx-auto px-4 sm:px-6">
-        <Reveal>
-        <div className="premium-card-bg border-2 border-gold/50 rounded-3xl p-8 sm:p-12 text-center glow-gold">
-          <i className="fa-solid fa-crown text-3xl text-gold mb-4" />
-          <h2 className="text-xl sm:text-3xl font-black text-gray-900 mb-4">{settings.vip_title}</h2>
-          <p className="text-gray-600 text-sm sm:text-lg leading-relaxed max-w-3xl mx-auto">{settings.vip_text}</p>
-        </div>
-        </Reveal>
-      </section>
-
-      {/* Pricing */}
-      <section id="pricing" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-16 sm:mb-20">
-          <span className="text-gold font-bold text-xs sm:text-sm uppercase tracking-wider block mb-2 font-mono">// PACKAGES</span>
-          <h2 className="text-2xl md:text-5xl font-black text-gray-900 mb-4">باقاتنا</h2>
-          <p className="text-gray-500 max-w-2xl mx-auto text-base sm:text-lg">أسعار تقديرية مبدئية - كل مشروع يُدرس على حدة حسب متطلباته الفعلية.</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-          <Reveal delay={0}>
-          <div className="premium-card-bg border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-lg h-full hover-lift">
-            <h3 className="text-lg sm:text-xl font-black text-gray-900 mb-2">الأساسية</h3>
-            <div className="text-2xl sm:text-3xl font-black text-gold mb-6 font-mono">{settings.price_basic}</div>
-            <a href={wa} target="_blank" rel="noopener noreferrer" className="block text-center border border-gold/50 text-[#8a6d1f] font-bold py-3 rounded-xl hover:bg-gold/10 transition-all focus-visible:ring-4 focus-visible:ring-gold/30 focus-visible:outline-none">اطلب استشارة</a>
-          </div>
-          </Reveal>
-          <Reveal delay={100}>
-          <div className="premium-card-bg border-2 border-gold rounded-3xl p-6 sm:p-8 shadow-2xl glow-gold relative h-full hover-lift">
-            <span className="absolute -top-3 right-6 bg-gold text-black text-xs font-black px-3 py-1 rounded-full">الأكثر طلباً</span>
-            <h3 className="text-lg sm:text-xl font-black text-gray-900 mb-2">الاحترافية</h3>
-            <div className="text-2xl sm:text-3xl font-black text-gold mb-6 font-mono">{settings.price_pro}</div>
-            <a href={wa} target="_blank" rel="noopener noreferrer" className="block text-center gold-bg-gradient text-black font-black py-3 rounded-xl hover:opacity-90 transition-all focus-visible:ring-4 focus-visible:ring-gold/50 focus-visible:outline-none">اطلب استشارة</a>
-          </div>
-          </Reveal>
-          <Reveal delay={200}>
-          <div className="premium-card-bg border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-lg h-full hover-lift">
-            <h3 className="text-lg sm:text-xl font-black text-gray-900 mb-2">المتكاملة</h3>
-            <div className="text-2xl sm:text-3xl font-black text-gold mb-6 font-mono">{settings.price_premium}</div>
-            <a href={wa} target="_blank" rel="noopener noreferrer" className="block text-center border border-gold/50 text-[#8a6d1f] font-bold py-3 rounded-xl hover:bg-gold/10 transition-all focus-visible:ring-4 focus-visible:ring-gold/30 focus-visible:outline-none">اطلب استشارة</a>
-          </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section id="faq" className="py-16 sm:py-24 max-w-4xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-2xl md:text-4xl font-black text-gray-900 mb-4">أسئلة يطرحها شركاؤنا عادةً</h2>
-        </div>
-        <div className="space-y-6">
-          {faqs.length === 0 && <p className="text-center text-gray-500 text-sm">لسه معملناش أسئلة شائعة - أضفها من لوحة التحكم.</p>}
-          {faqs.map((f, i) => (
-            <details key={f.id} className="group premium-card-bg border-2 border-gray-200 rounded-2xl p-5 sm:p-6 cursor-pointer shadow-md" open={i === 0}>
-              <summary className="flex items-center justify-between text-gray-900 font-black text-base sm:text-xl">
-                <span>{f.question}</span>
-                <span className="transition group-open:rotate-180 text-gold text-lg"><i className="fa-solid fa-chevron-down" /></span>
-              </summary>
-              <p className="mt-4 text-gray-600 text-sm sm:text-lg leading-relaxed border-t border-gray-200 pt-4">{f.answer}</p>
-            </details>
-          ))}
-        </div>
+      {/* Pricing teaser */}
+      <section className="py-16 sm:py-24 max-w-4xl mx-auto px-4 sm:px-6 text-center">
+        <span className="text-gold font-bold text-xs sm:text-sm uppercase tracking-wider block mb-2 font-mono">// PACKAGES</span>
+        <h2 className="text-2xl md:text-5xl font-black text-gray-900 mb-4">باقاتنا</h2>
+        <p className="text-gray-500 max-w-xl mx-auto mb-10">أسعار تقديرية مبدئية تبدأ من <span className="text-gold font-black font-mono">{pricingPlans[0]?.price || '—'}</span> - كل مشروع يُدرس على حدة.</p>
+        <a href="/pricing" className="inline-flex items-center gap-2 gold-bg-gradient text-black font-black px-6 sm:px-8 py-3 sm:py-4 rounded-xl hover-lift">
+          شاهد كل الباقات بالتفصيل <i className="fa-solid fa-arrow-left" />
+        </a>
       </section>
 
       {/* Contact */}
@@ -419,84 +274,20 @@ export default async function Home() {
             <i className="fa-solid fa-headset text-3xl sm:text-4xl" />
           </div>
           <h2 className="text-2xl md:text-5xl font-black text-gray-900 mb-6">دعنا نُهندس مظهرك الرقمي القادم</h2>
-          <a href={wa} target="_blank" rel="noopener noreferrer" className="inline-flex gold-bg-gradient hover:opacity-90 text-black font-black text-lg sm:text-xl px-8 sm:px-12 py-4 sm:py-6 rounded-2xl transition-all shadow-2xl items-center gap-4 active:scale-95 w-full sm:w-auto justify-center">
-            اضغط هنا للتواصل ومناقشة مشروعك
-          </a>
-          {settings.contact_email && (
-            <div className="mt-10 pt-10 border-t border-gray-200">
-              <p className="text-gray-500 text-sm mb-6">أو راسلنا مباشرة</p>
-              <form action={`https://formsubmit.co/${settings.contact_email}`} method="POST" className="max-w-md mx-auto space-y-4 text-right">
-                <input type="hidden" name="_subject" value="طلب تواصل جديد من موقع Amvora" />
-                <input type="hidden" name="_next" value={`${process.env.NEXT_PUBLIC_SITE_URL || ''}/#contact-section?sent=1`} />
-                <label className="sr-only" htmlFor="c-name">الاسم</label>
-                <input id="c-name" type="text" name="الاسم" required placeholder="الاسم" className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900" />
-                <label className="sr-only" htmlFor="c-phone">رقم الهاتف</label>
-                <input id="c-phone" type="text" name="رقم الهاتف" required placeholder="رقم الهاتف" className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900" />
-                <label className="sr-only" htmlFor="c-details">تفاصيل المشروع</label>
-                <textarea id="c-details" name="تفاصيل المشروع" rows="3" placeholder="تفاصيل مشروعك" className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900" />
-                <button type="submit" className="w-full border border-gold/50 text-[#8a6d1f] font-bold py-3 rounded-xl hover:bg-gold/10 transition-all">إرسال الطلب</button>
-              </form>
-            </div>
-          )}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+            <a href={wa} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto inline-flex gold-bg-gradient hover:opacity-90 text-black font-black text-base sm:text-xl px-6 sm:px-10 py-4 sm:py-5 rounded-2xl transition-all shadow-2xl items-center gap-3 active:scale-95 justify-center pulse-cta">
+              <i className="fa-brands fa-whatsapp" /> تواصل سريع عبر الواتساب
+            </a>
+            <ConsultationCTA locale="ar" wa={wa} email={settings.contact_email || 'amvora.agency@gmail.com'} className="w-full sm:w-auto inline-flex items-center gap-3 border-2 border-gold text-[#8a6d1f] font-black text-base sm:text-xl px-6 sm:px-10 py-4 sm:py-5 rounded-2xl transition-all hover:bg-gold/10 justify-center" />
+          </div>
+          <p className="text-gray-500 text-sm mt-8">
+            <a href="/contact" className="text-[#8a6d1f] font-bold hover:underline">أو راسلنا من نموذج التواصل الكامل وشوف أسئلة شائعة ←</a>
+          </p>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 bg-[#ece3cf] text-gray-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 text-sm">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <Image src="/logo.png" alt="Amvora Logo" width={40} height={40} className="w-10 h-10 object-contain rounded-full border border-gold/40 bg-white p-1" />
-              <span className="text-lg font-black tracking-wider text-gray-900 font-mono">AMVORA<span className="text-gold">.</span></span>
-            </div>
-            <p className="leading-relaxed">وكالة هندسة منصات رقمية مخصصة: مواقع تعريفية للمهنيين، عقارات، متاجر إلكترونية، وتكامل بوابات دفع.</p>
-          </div>
-          <div>
-            <h4 className="text-gray-900 font-bold mb-4">روابط سريعة</h4>
-            <ul className="space-y-2">
-              <li><a href="#services" className="hover:text-[#8a6d1f]">خدماتنا</a></li>
-              <li><a href="#process" className="hover:text-[#8a6d1f]">خطوات العمل</a></li>
-              <li><a href="#portfolio" className="hover:text-[#8a6d1f]">أعمالنا</a></li>
-              <li><a href="#testimonials" className="hover:text-[#8a6d1f]">آراء العملاء</a></li>
-              <li><a href="#about" className="hover:text-[#8a6d1f]">من نحن</a></li>
-              <li><a href="#pricing" className="hover:text-[#8a6d1f]">الباقات</a></li>
-              <li><a href="#faq" className="hover:text-[#8a6d1f]">الأسئلة الشائعة</a></li>
-              <li><a href="/blog" className="hover:text-[#8a6d1f]">المدونة</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-gray-900 font-bold mb-4">تواصل معنا</h4>
-            <ul className="space-y-2">
-              <li><a href={wa} target="_blank" rel="noopener noreferrer" className="hover:text-[#8a6d1f] flex items-center gap-2"><i className="fa-brands fa-whatsapp" /> واتساب</a></li>
-              {settings.contact_email && (
-                <li><a href={`mailto:${settings.contact_email}`} className="hover:text-[#8a6d1f] flex items-center gap-2"><i className="fa-solid fa-envelope" /> {settings.contact_email}</a></li>
-              )}
-              <li><a href="#contact-section" className="hover:text-[#8a6d1f] flex items-center gap-2"><i className="fa-solid fa-headset" /> نموذج تواصل</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-gray-900 font-bold mb-4">تابعنا</h4>
-            <div className="flex gap-4 text-lg">
-              {settings.facebook_url && <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gold" aria-label="فيسبوك"><i className="fa-brands fa-facebook" /></a>}
-              {settings.instagram_url && <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gold" aria-label="إنستجرام"><i className="fa-brands fa-instagram" /></a>}
-              {settings.linkedin_url && <a href={settings.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gold" aria-label="لينكد إن"><i className="fa-brands fa-linkedin" /></a>}
-              {!settings.facebook_url && !settings.instagram_url && !settings.linkedin_url && (
-                <span className="text-gray-400 text-xs">أضف روابطك من لوحة التحكم</span>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="border-t border-gray-300 text-center text-[10px] sm:text-xs py-6 px-4">
-          <p className="font-mono mb-1 text-gray-900 font-bold">&copy; {new Date().getFullYear()} AMVORA AGENCY. ALL RIGHTS RESERVED.</p>
-          <p className="mt-2">
-            <a href="/privacy" className="text-gray-500 hover:text-gold">سياسة الخصوصية</a>
-            <span className="mx-2">·</span>
-            <a href="/terms" className="text-gray-500 hover:text-gold">الشروط والأحكام</a>
-            <span className="mx-2">·</span>
-            <a href="/admin" className="text-gray-500 hover:text-gold">لوحة التحكم</a>
-          </p>
-        </div>
-      </footer>
+      <WaveDivider fromColor="#ffffff" toColor="#0f1f3d" />
+      <SiteFooter locale="ar" settings={settings} wa={wa} />
       <a
         href={wa}
         target="_blank"

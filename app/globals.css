@@ -4,11 +4,13 @@
 
 body {
   background-color: #ffffff;
-  font-family: 'Almarai', sans-serif;
+  font-family: 'Cairo', sans-serif;
 }
 
 h1, h2, h3, h4, .font-display {
-  font-family: 'El Messiri', sans-serif;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 .premium-card-bg {
@@ -30,12 +32,50 @@ h1, h2, h3, h4, .font-display {
   background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
 }
 
+.brand-gradient-text {
+  background: linear-gradient(90deg, #0f1f3d 0%, #2f8fa3 55%, #d4af37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.navy-bg-gradient {
+  background: linear-gradient(160deg, #0f1f3d 0%, #16294a 55%, #0f1f3d 100%);
+}
+
+.navy-card-bg {
+  background-color: #0f1f3d;
+}
+
 .hover-lift {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .hover-lift:hover {
   transform: translateY(-6px);
   box-shadow: 0 20px 40px -15px rgba(197, 160, 89, 0.35);
+}
+
+@keyframes soft-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(197, 160, 89, 0.45); }
+  50% { box-shadow: 0 0 0 14px rgba(197, 160, 89, 0); }
+}
+.pulse-cta {
+  animation: soft-pulse 2.6s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-cta { animation: none; }
+}
+
+@keyframes blob-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(20px, -25px) scale(1.08); }
+  66% { transform: translate(-15px, 15px) scale(0.95); }
+}
+.blob-float {
+  animation: blob-float 12s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .blob-float { animation: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

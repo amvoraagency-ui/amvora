@@ -3,6 +3,10 @@ import { getSettings } from '@/lib/db';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://amvora.vercel.app';
 
+export const viewport = {
+  themeColor: '#0f1f3d',
+};
+
 export async function generateMetadata() {
   let verificationCode = '';
   try {
@@ -55,6 +59,12 @@ export async function generateMetadata() {
       },
     },
     ...(verificationCode ? { verification: { google: verificationCode } } : {}),
+    icons: {
+      icon: '/logo.png',
+      apple: '/logo.png',
+      shortcut: '/logo.png',
+    },
+    manifest: '/manifest.json',
   };
 }
 
@@ -64,7 +74,7 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@500;700;800;900&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
       </head>
       <body className="font-body text-gray-800 antialiased overflow-x-hidden bg-white">

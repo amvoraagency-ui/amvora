@@ -1,16 +1,34 @@
+import { getSettings } from '@/lib/db';
+import { fetchSiteContent } from '@/lib/content';
+import SiteHeader from '@/components/SiteHeader';
+import SiteFooter from '@/components/SiteFooter';
+
 export const metadata = {
   title: 'Terms of Service',
   robots: { index: true, follow: true },
+  alternates: { canonical: '/en/terms' },
 };
 
-export default function TermsOfServiceEn() {
+export const dynamic = 'force-dynamic';
+
+export default async function TermsOfServiceEn() {
+  let settings = {};
+  try {
+    settings = await getSettings();
+  } catch {
+    settings = {};
+  }
+  const { wa } = await fetchSiteContent('en');
+  const LAST_UPDATED = settings.terms_updated_en || 'July 30, 2026';
+
   return (
-    <main className="min-h-screen bg-white px-4 py-16 sm:py-24" dir="ltr" lang="en">
-      <div className="max-w-3xl mx-auto">
+    <main className="min-h-screen bg-white" dir="ltr" lang="en">
+      <SiteHeader locale="en" wa={wa} />
+      <div className="max-w-3xl mx-auto px-4 py-16 sm:py-24">
         <h1 className="text-2xl sm:text-4xl font-black text-gray-900 mb-8">Terms of Service</h1>
 
         <div className="space-y-6 text-gray-600 text-sm sm:text-base leading-relaxed">
-          <p>Last updated: {new Date().toLocaleDateString('en-US')}</p>
+          <p>Last updated: {LAST_UPDATED}</p>
 
           <section>
             <h2 className="text-gray-900 font-bold text-lg mb-2">1. Scope of Service</h2>
@@ -60,6 +78,7 @@ export default function TermsOfServiceEn() {
           </section>
         </div>
       </div>
+      <SiteFooter locale="en" settings={settings} wa={wa} />
     </main>
   );
 }

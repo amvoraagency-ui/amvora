@@ -3,35 +3,31 @@ import { useState } from 'react';
 
 const LINKS = {
   ar: [
-    { href: '#services', label: 'خدماتنا' },
-    { href: '#process', label: 'خطوات العمل' },
-    { href: '#portfolio', label: 'أعمالنا' },
-    { href: '#testimonials', label: 'آراء العملاء' },
-    { href: '#about', label: 'من نحن' },
-    { href: '#pricing', label: 'الباقات' },
-    { href: '#faq', label: 'الأسئلة الشائعة' },
+    { href: '/services', label: 'خدماتنا' },
+    { href: '/portfolio', label: 'أعمالنا' },
+    { href: '/#testimonials', label: 'آراء العملاء' },
+    { href: '/about', label: 'من نحن' },
+    { href: '/pricing', label: 'الباقات' },
     { href: '/blog', label: 'المدونة' },
-    { href: '#contact-section', label: 'تواصل معنا' },
+    { href: '/contact', label: 'تواصل معنا' },
   ],
   en: [
-    { href: '#services', label: 'Services' },
-    { href: '#process', label: 'Process' },
-    { href: '#portfolio', label: 'Work' },
-    { href: '#testimonials', label: 'Reviews' },
-    { href: '#about', label: 'About' },
-    { href: '#pricing', label: 'Pricing' },
-    { href: '#faq', label: 'FAQ' },
+    { href: '/en/services', label: 'Services' },
+    { href: '/en/portfolio', label: 'Work' },
+    { href: '/en#testimonials', label: 'Reviews' },
+    { href: '/en/about', label: 'About' },
+    { href: '/en/pricing', label: 'Pricing' },
     { href: '/en/blog', label: 'Blog' },
-    { href: '#contact-section', label: 'Contact' },
+    { href: '/en/contact', label: 'Contact' },
   ],
 };
 
 export function DesktopNav({ locale = 'ar' }) {
   const links = LINKS[locale] || LINKS.ar;
   return (
-    <nav className="hidden lg:flex items-center gap-5 text-sm font-bold text-gray-600">
+    <nav className="hidden lg:flex items-center gap-3 xl:gap-5 text-xs xl:text-sm font-bold text-gray-600 shrink-0">
       {links.map((l) => (
-        <a key={l.href} href={l.href} className="hover:text-[#8a6d1f] transition-colors">
+        <a key={l.href} href={l.href} className="hover:text-[#8a6d1f] transition-colors whitespace-nowrap">
           {l.label}
         </a>
       ))}

@@ -1,0 +1,19 @@
+{
+  "name": "Amvora - هندسة المنصات الرقمية المخصصة",
+  "short_name": "Amvora",
+  "description": "وكالة Amvora تبني بنيات برمجية مخصصة كلياً بكود نظيف للعقارات والمتاجر الإلكترونية والمهن الحرة.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f1f3d",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

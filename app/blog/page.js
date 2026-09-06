@@ -1,12 +1,19 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getBlogPosts, getSettings } from '@/lib/db';
+import { fetchSiteContent } from '@/lib/content';
+import { readingTime } from '@/lib/readingTime';
+import SiteHeader from '@/components/SiteHeader';
+import SiteFooter from '@/components/SiteFooter';
+import BackToTop from '@/components/BackToTop';
+import BlogFilter from '@/components/BlogFilter';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'المدونة',
   description: 'مقالات ونصائح من فريق Amvora عن تصميم المواقع، التسويق الرقمي، والهوية الرقمية للأعمال.',
+  alternates: { canonical: '/blog' },
 };
 
 export default async function BlogIndex() {
@@ -22,23 +29,18 @@ export default async function BlogIndex() {
   } catch {
     settings = {};
   }
+  const { wa } = await fetchSiteContent('ar');
+
+  const featured = posts.find((p) => p.featured) || null;
+  const rest = posts.filter((p) => p.id !== featured?.id);
+  const categories = Array.from(new Set(posts.map((p) => p.category).filter(Boolean)));
 
   return (
     <main className="min-h-screen bg-white">
-      <header className="border-b border-gray-200 bg-white/95 backdrop-blur-md sticky top-0 z-50 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-3">
-            <Image src="/logo.png" alt="Amvora Logo" width={48} height={48} className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-full border border-[#c5a059]/40 shadow-lg bg-[#f6f1e6] p-1" />
-            <span className="text-lg sm:text-xl font-black tracking-wider text-gray-900 font-mono">AMVORA<span className="text-gold">.</span></span>
-          </Link>
-          <Link href="/" className="text-xs sm:text-sm font-bold text-gray-500 hover:text-gold border border-gray-200 rounded-lg px-3 py-2">
-            الرجوع للموقع
-          </Link>
-        </div>
-      </header>
+      <SiteHeader locale="ar" wa={wa} />
 
       <section className="py-16 sm:py-20 max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <span className="text-gold font-bold text-xs sm:text-sm uppercase tracking-wider block mb-2 font-mono">// BLOG</span>
           <h1 className="text-3xl sm:text-5xl font-black text-gray-900 mb-4">المدونة</h1>
           <p className="text-gray-500 max-w-xl mx-auto">مقالات ونصائح عملية عن تصميم المواقع والتواجد الرقمي لعملك.</p>
@@ -51,31 +53,59 @@ export default async function BlogIndex() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-          {posts.map((post) => (
-            <Link key={post.id} href={`/blog/${post.slug}`} className="premium-card-bg border border-gray-200 rounded-3xl overflow-hidden hover:border-gold/50 transition-all shadow-lg hover-lift block">
-              {post.cover_image && (
-                <div className="relative w-full h-44">
-                  <Image src={post.cover_image} alt={post.title} fill className="object-cover" />
+        {featured && (
+          <Link href={`/blog/${featured.slug}`} className="block premium-card-bg border-2 border-gold/40 rounded-3xl overflow-hidden hover:border-gold transition-all shadow-xl glow-gold mb-10 group">
+            <div className="grid grid-cols-1 sm:grid-cols-2">
+              {featured.cover_image && (
+                <div className="relative w-full h-56 sm:h-full min-h-[220px]">
+                  <Image src={featured.cover_image} alt={featured.title} fill className="object-cover" />
                 </div>
               )}
-              <div className="p-6">
-                <p className="text-gray-400 text-xs font-mono mb-2">{new Date(post.created_at).toLocaleDateString('ar-EG')}</p>
-                <h2 className="text-gray-900 font-black text-lg mb-2">{post.title}</h2>
-                {post.excerpt && <p className="text-gray-500 text-sm leading-relaxed">{post.excerpt}</p>}
-                <span className="inline-block mt-4 text-[#8a6d1f] text-sm font-bold">اقرأ المزيد ←</span>
+              <div className="p-6 sm:p-8 flex flex-col justify-center">
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-black bg-gold rounded-full px-3 py-1 w-fit mb-4">
+                  <i className="fa-solid fa-star" /> مقال مميز
+                </span>
+                {featured.category && <span className="text-gold text-xs font-bold uppercase tracking-wider mb-2">{featured.category}</span>}
+                <h2 className="text-gray-900 font-black text-xl sm:text-2xl mb-3 group-hover:text-[#8a6d1f] transition-colors">{featured.title}</h2>
+                {featured.excerpt && <p className="text-gray-500 text-sm leading-relaxed mb-4">{featured.excerpt}</p>}
+                <p className="text-gray-400 text-xs font-mono">
+                  {new Date(featured.created_at).toLocaleDateString('ar-EG')} · {readingTime(featured.content, 'ar')}
+                </p>
               </div>
-            </Link>
-          ))}
-        </div>
+            </div>
+          </Link>
+        )}
+
+        {categories.length > 0 ? (
+          <BlogFilter posts={rest} categories={categories} locale="ar" />
+        ) : (
+          rest.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+              {rest.map((post) => (
+                <Link key={post.id} href={`/blog/${post.slug}`} className="premium-card-bg border border-gray-200 rounded-3xl overflow-hidden hover:border-gold/50 transition-all shadow-lg hover-lift block">
+                  {post.cover_image && (
+                    <div className="relative w-full h-44">
+                      <Image src={post.cover_image} alt={post.title} fill className="object-cover" />
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <p className="text-gray-400 text-xs font-mono mb-2">{new Date(post.created_at).toLocaleDateString('ar-EG')} · {readingTime(post.content, 'ar')}</p>
+                    <h2 className="text-gray-900 font-black text-lg mb-2">{post.title}</h2>
+                    {post.excerpt && <p className="text-gray-500 text-sm leading-relaxed">{post.excerpt}</p>}
+                    <span className="inline-block mt-4 text-[#8a6d1f] text-sm font-bold">اقرأ المزيد ←</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )
+        )}
       </section>
 
-      <footer className="border-t border-gray-200 bg-[#ece3cf] text-gray-600 py-10 text-center text-xs">
-        <p className="font-mono font-bold text-gray-900">&copy; {new Date().getFullYear()} AMVORA AGENCY.</p>
-        <p className="mt-2">
-          <a href={`https://wa.me/${settings.whatsapp_number || '201000446294'}`} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gold">تواصل معنا</a>
-        </p>
-      </footer>
+      <SiteFooter locale="ar" settings={settings} wa={wa} />
+      <a href={wa} target="_blank" rel="noopener noreferrer" aria-label="تواصل عبر واتساب" className="fixed bottom-6 left-6 z-40 w-14 h-14 rounded-full bg-[#25D366] text-white shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform focus-visible:ring-4 focus-visible:ring-[#25D366]/50 focus-visible:outline-none">
+        <i className="fa-brands fa-whatsapp" />
+      </a>
+      <BackToTop />
     </main>
   );
 }

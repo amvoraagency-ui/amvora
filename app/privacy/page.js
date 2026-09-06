@@ -1,8 +1,12 @@
 import { getSettings } from '@/lib/db';
+import { fetchSiteContent } from '@/lib/content';
+import SiteHeader from '@/components/SiteHeader';
+import SiteFooter from '@/components/SiteFooter';
 
 export const metadata = {
   title: 'سياسة الخصوصية',
   robots: { index: true, follow: true },
+  alternates: { canonical: '/privacy' },
 };
 
 export const dynamic = 'force-dynamic';
@@ -14,11 +18,13 @@ export default async function PrivacyPolicy() {
   } catch {
     settings = {};
   }
+  const { wa } = await fetchSiteContent('ar');
   const LAST_UPDATED = settings.privacy_updated_ar || '30 يوليو 2026';
 
   return (
-    <main className="min-h-screen bg-white px-4 py-16 sm:py-24">
-      <div className="max-w-3xl mx-auto">
+    <main className="min-h-screen bg-white">
+      <SiteHeader locale="ar" wa={wa} />
+      <div className="max-w-3xl mx-auto px-4 py-16 sm:py-24">
         <h1 className="text-2xl sm:text-4xl font-black text-gray-900 mb-8">سياسة الخصوصية</h1>
 
         <div className="space-y-6 text-gray-600 text-sm sm:text-base leading-relaxed">
@@ -27,7 +33,7 @@ export default async function PrivacyPolicy() {
           <section>
             <h2 className="text-gray-900 font-bold text-lg mb-2">١. البيانات اللي بنجمعها</h2>
             <p className="mb-3">
-              لما تستخدم نموذج التواصل، بنجمع الاسم ورقم الهاتف وتفاصيل مشروعك اللي تكتبها. لو شاركتنا رأيك عن خدماتنا، بنخزن اسمك وصفتك (اختياري) ونص رأيك وتقييمك.
+              لما تستخدم نموذج طلب الاستشارة أو نموذج التواصل، بنجمع الاسم ورقم الهاتف/وسيلة التواصل، اسم الشركة (لو موجود)، ومعلومات مشروعك (المجال، الميزات المطلوبة، الميزانية التقريبية، والملاحظات) اللي تختارها أو تكتبها بنفسك. لو شاركتنا رأيك عن خدماتنا، بنخزن اسمك وصفتك (اختياري) ونص رأيك وتقييمك.
             </p>
             <p>
               كمان بنسجل عنوان الـ IP بتاع جهازك بشكل مؤقت عند إرسال أي نموذج، وده بس لغرض حماية الموقع من محاولات إغراق الطلبات الآلية (مش لتتبعك أو التعرف عليك).
@@ -71,7 +77,7 @@ export default async function PrivacyPolicy() {
           <section>
             <h2 className="text-gray-900 font-bold text-lg mb-2">٦. مدة الاحتفاظ بالبيانات</h2>
             <p>
-              آراء العملاء المنشورة بتفضل محفوظة لحد ما تطلب حذفها بنفسك أو يحذفها صاحب الموقع. رسائل نموذج التواصل بتتبعت مباشرة بالإيميل ومش بتتخزن في قاعدة بيانات الموقع.
+              آراء العملاء المنشورة بتفضل محفوظة لحد ما تطلب حذفها بنفسك أو يحذفها صاحب الموقع. طلبات الاستشارة بتتبعت بالإيميل فوراً، وبنحتفظ بنسخة منها في قاعدة بيانات الموقع كسجل متابعة داخلي لحد ما تُحذف يدوياً من صاحب الموقع.
             </p>
           </section>
 
@@ -95,6 +101,7 @@ export default async function PrivacyPolicy() {
           </section>
         </div>
       </div>
+      <SiteFooter locale="ar" settings={settings} wa={wa} />
     </main>
   );
 }

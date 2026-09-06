@@ -1,4 +1,4 @@
-import { getBlogPosts } from '@/lib/db';
+import { getBlogPosts, getPortfolioItems } from '@/lib/db';
 
 export default async function sitemap() {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://amvora.vercel.app';
@@ -6,6 +6,16 @@ export default async function sitemap() {
   const staticPages = [
     { url: siteUrl, lastModified: new Date(), changeFrequency: 'weekly', priority: 1 },
     { url: `${siteUrl}/en`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${siteUrl}/services`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${siteUrl}/en/services`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${siteUrl}/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${siteUrl}/en/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${siteUrl}/pricing`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${siteUrl}/en/pricing`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${siteUrl}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${siteUrl}/en/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${siteUrl}/portfolio`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${siteUrl}/en/portfolio`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
     { url: `${siteUrl}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
     { url: `${siteUrl}/en/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.6 },
     { url: `${siteUrl}/privacy`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
@@ -35,5 +45,18 @@ export default async function sitemap() {
     blogPages = [];
   }
 
-  return [...staticPages, ...blogPages];
+  let portfolioPages = [];
+  try {
+    const items = await getPortfolioItems();
+    portfolioPages = items
+      .filter((p) => p.slug)
+      .flatMap((p) => [
+        { url: `${siteUrl}/portfolio/${p.slug}`, lastModified: new Date(p.created_at), changeFrequency: 'monthly', priority: 0.6 },
+        { url: `${siteUrl}/en/portfolio/${p.slug}`, lastModified: new Date(p.created_at), changeFrequency: 'monthly', priority: 0.5 },
+      ]);
+  } catch {
+    portfolioPages = [];
+  }
+
+  return [...staticPages, ...blogPages, ...portfolioPages];
 }

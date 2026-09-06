@@ -1,7 +1,7 @@
 export default function TickerBar({ text }) {
   if (!text) return null;
   return (
-    <div className="bg-[#1a1a2e] text-[#f3e1b9] text-xs sm:text-sm py-2 overflow-hidden whitespace-nowrap border-b border-black/20">
+    <div className="bg-navy text-[#f3e1b9] text-xs sm:text-sm py-2 overflow-hidden whitespace-nowrap border-b border-black/20">
       <div className="ticker-track inline-block">
         <span className="mx-8">{text}</span>
         <span className="mx-8">{text}</span>

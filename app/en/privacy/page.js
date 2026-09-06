@@ -1,8 +1,12 @@
 import { getSettings } from '@/lib/db';
+import { fetchSiteContent } from '@/lib/content';
+import SiteHeader from '@/components/SiteHeader';
+import SiteFooter from '@/components/SiteFooter';
 
 export const metadata = {
   title: 'Privacy Policy',
   robots: { index: true, follow: true },
+  alternates: { canonical: '/en/privacy' },
 };
 
 export const dynamic = 'force-dynamic';
@@ -14,11 +18,13 @@ export default async function PrivacyPolicyEn() {
   } catch {
     settings = {};
   }
+  const { wa } = await fetchSiteContent('en');
   const LAST_UPDATED = settings.privacy_updated_en || 'July 30, 2026';
 
   return (
-    <main className="min-h-screen bg-white px-4 py-16 sm:py-24" dir="ltr" lang="en">
-      <div className="max-w-3xl mx-auto">
+    <main className="min-h-screen bg-white" dir="ltr" lang="en">
+      <SiteHeader locale="en" wa={wa} />
+      <div className="max-w-3xl mx-auto px-4 py-16 sm:py-24">
         <h1 className="text-2xl sm:text-4xl font-black text-gray-900 mb-8">Privacy Policy</h1>
 
         <div className="space-y-6 text-gray-600 text-sm sm:text-base leading-relaxed">
@@ -27,7 +33,7 @@ export default async function PrivacyPolicyEn() {
           <section>
             <h2 className="text-gray-900 font-bold text-lg mb-2">1. Information We Collect</h2>
             <p className="mb-3">
-              When you use our contact form, we collect the name, phone number, and project details you provide. If you share a review of our services, we store your name, role (optional), review text, and rating.
+              When you use our consultation request or contact form, we collect your name, phone/contact method, company name (if any), and project details (industry, requested features, approximate budget, and notes) that you choose to provide. If you share a review of our services, we store your name, role (optional), review text, and rating.
             </p>
             <p>
               We also temporarily log your device&apos;s IP address when you submit any form, solely to protect the site against automated spam and abuse (not to track or identify you).
@@ -71,7 +77,7 @@ export default async function PrivacyPolicyEn() {
           <section>
             <h2 className="text-gray-900 font-bold text-lg mb-2">6. Data Retention</h2>
             <p>
-              Published reviews remain stored until you request their removal or the site owner removes them. Contact form messages are sent directly by email and are not stored in the site&apos;s database.
+              Published reviews remain stored until you request their removal or the site owner removes them. Consultation requests are sent immediately by email, and we also keep a copy in our database as an internal follow-up record until it is manually deleted by the site owner.
             </p>
           </section>
 
@@ -95,6 +101,7 @@ export default async function PrivacyPolicyEn() {
           </section>
         </div>
       </div>
+      <SiteFooter locale="en" settings={settings} wa={wa} />
     </main>
   );
 }

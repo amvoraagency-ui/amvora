@@ -1,16 +1,34 @@
+import { getSettings } from '@/lib/db';
+import { fetchSiteContent } from '@/lib/content';
+import SiteHeader from '@/components/SiteHeader';
+import SiteFooter from '@/components/SiteFooter';
+
 export const metadata = {
   title: 'الشروط والأحكام',
   robots: { index: true, follow: true },
+  alternates: { canonical: '/terms' },
 };
 
-export default function TermsOfService() {
+export const dynamic = 'force-dynamic';
+
+export default async function TermsOfService() {
+  let settings = {};
+  try {
+    settings = await getSettings();
+  } catch {
+    settings = {};
+  }
+  const { wa } = await fetchSiteContent('ar');
+  const LAST_UPDATED = settings.terms_updated_ar || '30 يوليو 2026';
+
   return (
-    <main className="min-h-screen bg-white px-4 py-16 sm:py-24">
-      <div className="max-w-3xl mx-auto">
+    <main className="min-h-screen bg-white">
+      <SiteHeader locale="ar" wa={wa} />
+      <div className="max-w-3xl mx-auto px-4 py-16 sm:py-24">
         <h1 className="text-2xl sm:text-4xl font-black text-gray-900 mb-8">الشروط والأحكام</h1>
 
         <div className="space-y-6 text-gray-600 text-sm sm:text-base leading-relaxed">
-          <p>آخر تحديث: {new Date().toLocaleDateString('ar-EG')}</p>
+          <p>آخر تحديث: {LAST_UPDATED}</p>
 
           <section>
             <h2 className="text-gray-900 font-bold text-lg mb-2">١. نطاق الخدمة</h2>
@@ -60,6 +78,7 @@ export default function TermsOfService() {
           </section>
         </div>
       </div>
+      <SiteFooter locale="ar" settings={settings} wa={wa} />
     </main>
   );
 }
