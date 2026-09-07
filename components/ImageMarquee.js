@@ -31,7 +31,7 @@ export default function ImageMarquee({ items = [], locale = 'ar' }) {
           </span>
         </div>
         <style>{`
-          .marquee-track { animation: marquee-scroll 32s linear infinite; }
+          .marquee-track { animation: marquee-scroll 96s linear infinite; }
           @keyframes marquee-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
           @media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }
         `}</style>
@@ -60,7 +60,7 @@ export default function ImageMarquee({ items = [], locale = 'ar' }) {
         </span>
       </div>
       <style>{`
-        .marquee-track { animation: marquee-scroll 40s linear infinite; }
+        .marquee-track { animation: marquee-scroll 120s linear infinite; }
         .marquee-track:hover { animation-play-state: paused; }
         @keyframes marquee-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         @media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }

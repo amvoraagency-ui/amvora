@@ -17,7 +17,7 @@ export default function TickerBar({ text }) {
       </div>
       <style>{`
         .ticker-track {
-          animation: ticker-scroll 28s linear infinite;
+          animation: ticker-scroll 224s linear infinite;
         }
         @keyframes ticker-scroll {
           0% { transform: translateX(0%); }

@@ -87,7 +87,7 @@ export default async function AboutPageEn() {
       <a href={wa} target="_blank" rel="noopener noreferrer" aria-label="Contact us on WhatsApp" className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-[#25D366] text-white shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition-transform focus-visible:ring-4 focus-visible:ring-[#25D366]/50 focus-visible:outline-none">
         <i className="fa-brands fa-whatsapp" />
       </a>
-      <BackToTop />
+      <BackToTop side="left" />
     </main>
   );
 }

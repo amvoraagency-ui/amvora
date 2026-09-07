@@ -311,7 +311,7 @@ export default async function HomeEn() {
       >
         <i className="fa-brands fa-whatsapp" />
       </a>
-      <BackToTop />
+      <BackToTop side="left" />
     </main>
   );
 }

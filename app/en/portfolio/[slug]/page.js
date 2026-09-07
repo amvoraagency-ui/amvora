@@ -113,7 +113,7 @@ export default async function PortfolioDetailEn({ params }) {
       </article>
 
       <SiteFooter locale="en" settings={settings} wa={wa} />
-      <BackToTop />
+      <BackToTop side="left" />
     </main>
   );
 }

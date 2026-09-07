@@ -27,9 +27,9 @@ const LINKS = {
 };
 
 function isActive(pathname, href) {
-  const clean = href.split('#')[0];
-  if (clean === '/' || clean === '/en') return pathname === clean;
-  return pathname === clean || pathname.startsWith(clean + '/');
+  if (href.includes('#')) return false;
+  if (href === '/' || href === '/en') return pathname === href;
+  return pathname === href || pathname.startsWith(href + '/');
 }
 
 export function DesktopNav({ locale = 'ar' }) {
