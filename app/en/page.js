@@ -53,7 +53,7 @@ export default async function HomeEn() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }} />
       {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
       <GoogleAnalytics measurementId={settings.ga_measurement_id} />
-      <TickerBar text={settings.ticker_text} />
+      <TickerBar text={settings.ticker_text_en} />
       <SiteHeader locale="en" wa={wa} />
 
       {/* Hero */}

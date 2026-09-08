@@ -209,10 +209,47 @@ function PricingPlansTab() {
   const [locale, setLocale] = useState('ar');
   const [items, setItems] = useState([]);
   const [loaded, setLoaded] = useState(false);
-  const emptyForm = { name: '', price: '', tagline: '', features: '', highlighted: false };
+  const emptyForm = { name: '', price: '', tagline: '', features: '', highlighted: false, section: '' };
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState('');
+  const [legacy, setLegacy] = useState(null);
+  const [importing, setImporting] = useState(false);
+
+  async function checkLegacy() {
+    try {
+      const res = await fetch('/api/settings/legacy-pricing');
+      const data = await res.json();
+      setLegacy(data.hasLegacyData ? data.raw : false);
+    } catch {
+      setLegacy(false);
+    }
+  }
+
+  async function importLegacy() {
+    if (!legacy) return;
+    setImporting(true);
+    const plansAr = [
+      { name: 'الأساسية', price: legacy.price_basic, tagline: legacy.price_basic_tagline, features: legacy.price_basic_features, highlighted: false, locale: 'ar' },
+      { name: 'الاحترافية', price: legacy.price_pro, tagline: legacy.price_pro_tagline, features: legacy.price_pro_features, highlighted: true, locale: 'ar' },
+      { name: 'المتكاملة', price: legacy.price_premium, tagline: legacy.price_premium_tagline, features: legacy.price_premium_features, highlighted: false, locale: 'ar' },
+    ];
+    const plansEn = [
+      { name: 'Essentials', price: legacy.price_basic, tagline: legacy.price_basic_tagline_en, features: legacy.price_basic_features_en, highlighted: false, locale: 'en' },
+      { name: 'Professional', price: legacy.price_pro, tagline: legacy.price_pro_tagline_en, features: legacy.price_pro_features_en, highlighted: true, locale: 'en' },
+      { name: 'Integrated', price: legacy.price_premium, tagline: legacy.price_premium_tagline_en, features: legacy.price_premium_features_en, highlighted: false, locale: 'en' },
+    ];
+    for (const [i, plan] of [...plansAr, ...plansEn].entries()) {
+      await fetch('/api/pricing-plans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...plan, sort_order: i % 3 }),
+      });
+    }
+    setLegacy(false);
+    setImporting(false);
+    load(locale);
+  }
 
   async function load(loc) {
     setLoaded(false);
@@ -221,6 +258,8 @@ function PricingPlansTab() {
     setItems(data.items || []);
     setLoaded(true);
   }
+
+  useEffect(() => { checkLegacy(); }, []);
 
   useEffect(() => { load(locale); }, [locale]);
 
@@ -255,7 +294,7 @@ function PricingPlansTab() {
 
   function edit(item) {
     setEditingId(item.id);
-    setForm({ name: item.name, price: item.price || '', tagline: item.tagline || '', features: item.features || '', highlighted: item.highlighted });
+    setForm({ name: item.name, price: item.price || '', tagline: item.tagline || '', features: item.features || '', highlighted: item.highlighted, section: item.section || '' });
   }
 
   async function removeItem(id) {
@@ -284,12 +323,29 @@ function PricingPlansTab() {
         الباقات دي بتظهر في صفحة /pricing. تقدر تضيف أي عدد باقات أو تمسح أي باقة، والترتيب هنا هو نفسه ترتيبها في الموقع.
       </div>
 
+      {legacy && (
+        <div className="bg-amber-50 border-2 border-amber-400 text-amber-900 text-xs sm:text-sm rounded-xl p-4 mb-6 leading-relaxed">
+          <p className="font-bold mb-2">لقينا بيانات باقات كنت كاتبها قبل كده ومتعرضتش هنا!</p>
+          <p className="mb-3">هنستوردها كـ 3 باقات (عربي) + 3 باقات (إنجليزي) زي ما كانت بالظبط.</p>
+          <button onClick={importLegacy} disabled={importing} className="bg-amber-600 text-white font-bold px-4 py-2 rounded-lg text-xs disabled:opacity-50">
+            {importing ? 'جارٍ الاستيراد...' : 'استرجع البيانات دلوقتي'}
+          </button>
+        </div>
+      )}
+
       <div className="flex gap-2 mb-6">
         <button onClick={() => setLocale('ar')} className={`text-xs font-bold px-3 py-1.5 rounded-full border ${locale === 'ar' ? 'bg-gray-900 text-white border-gray-900' : 'border-gray-300 text-gray-600'}`}>عربي</button>
         <button onClick={() => setLocale('en')} className={`text-xs font-bold px-3 py-1.5 rounded-full border ${locale === 'en' ? 'bg-gray-900 text-white border-gray-900' : 'border-gray-300 text-gray-600'}`}>English</button>
       </div>
 
       <form onSubmit={submit} className="premium-card-bg border border-gray-200 rounded-2xl p-5 mb-8 space-y-3">
+        <div>
+          <input list="pricing-sections" placeholder="القسم (مثال: باقات العقارات) - اتركه فاضي لو عايزها من غير قسم" value={form.section} onChange={(e) => setForm({ ...form, section: e.target.value })} className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" />
+          <datalist id="pricing-sections">
+            {Array.from(new Set(items.map((i) => i.section).filter(Boolean))).map((s) => <option key={s} value={s} />)}
+          </datalist>
+          <p className="text-gray-400 text-[11px] mt-1">اكتب نفس اسم القسم بالظبط زي باقات تانية عشان يتجمعوا مع بعض (مثال: عقارات، متاجر إلكترونية، مهن حرة).</p>
+        </div>
         <input required placeholder="اسم الباقة" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" />
         <input placeholder="السعر (مثال: تبدأ من $XXX)" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" />
         <input placeholder="وصف مختصر - لمين الباقة دي" value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900" />
@@ -309,26 +365,37 @@ function PricingPlansTab() {
       {loaded && items.length === 0 && <p className="text-gray-400 text-sm">مفيش باقات لسه باللغة دي.</p>}
 
       <div className="space-y-3">
-        {items.map((item, idx) => (
-          <div key={item.id} className="border border-gray-200 rounded-2xl p-4 flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-bold text-gray-900 text-sm">{item.name}</span>
-                {item.highlighted && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gold/20 text-[#8a6d1f] border border-gold/40">مميزة</span>}
+        {items.map((item, idx) => {
+          const prevSection = idx > 0 ? (items[idx - 1].section || null) : undefined;
+          const showHeader = (item.section || null) !== prevSection;
+          return (
+          <div key={item.id}>
+            {showHeader && (
+              <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mt-6 mb-2 first:mt-0">
+                {item.section || 'بدون قسم'}
+              </p>
+            )}
+            <div className="border border-gray-200 rounded-2xl p-4 flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-bold text-gray-900 text-sm">{item.name}</span>
+                  {item.highlighted && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gold/20 text-[#8a6d1f] border border-gold/40">مميزة</span>}
+                </div>
+                <p className="text-gold text-sm font-mono mt-1">{item.price}</p>
+                {item.tagline && <p className="text-gray-500 text-xs mt-1">{item.tagline}</p>}
               </div>
-              <p className="text-gold text-sm font-mono mt-1">{item.price}</p>
-              {item.tagline && <p className="text-gray-500 text-xs mt-1">{item.tagline}</p>}
-            </div>
-            <div className="flex flex-col gap-1.5 shrink-0 text-xs items-end">
-              <div className="flex gap-1">
-                <button onClick={() => move(item.id, 'up')} disabled={idx === 0} className="text-gray-400 hover:text-gray-700 disabled:opacity-30 w-6 h-6"><i className="fa-solid fa-arrow-up" /></button>
-                <button onClick={() => move(item.id, 'down')} disabled={idx === items.length - 1} className="text-gray-400 hover:text-gray-700 disabled:opacity-30 w-6 h-6"><i className="fa-solid fa-arrow-down" /></button>
+              <div className="flex flex-col gap-1.5 shrink-0 text-xs items-end">
+                <div className="flex gap-1">
+                  <button onClick={() => move(item.id, 'up')} disabled={idx === 0} className="text-gray-400 hover:text-gray-700 disabled:opacity-30 w-6 h-6"><i className="fa-solid fa-arrow-up" /></button>
+                  <button onClick={() => move(item.id, 'down')} disabled={idx === items.length - 1} className="text-gray-400 hover:text-gray-700 disabled:opacity-30 w-6 h-6"><i className="fa-solid fa-arrow-down" /></button>
+                </div>
+                <button onClick={() => edit(item)} className="text-gray-600 hover:underline">تعديل</button>
+                <button onClick={() => removeItem(item.id)} className="text-red-600 hover:underline">حذف</button>
               </div>
-              <button onClick={() => edit(item)} className="text-gray-600 hover:underline">تعديل</button>
-              <button onClick={() => removeItem(item.id)} className="text-red-600 hover:underline">حذف</button>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
