@@ -11,6 +11,7 @@ import SiteFooter from '@/components/SiteFooter';
 import ConsultationCTA from '@/components/ConsultationCTA';
 import WaveDivider from '@/components/WaveDivider';
 import { fetchSiteContent } from '@/lib/content';
+import { safeJsonLd } from '@/lib/safeJsonLd';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,8 +51,8 @@ export default async function HomeEn() {
 
   return (
     <main id="main-content">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }} />
-      {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(orgSchema) }} />
+      {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(faqSchema) }} />}
       <GoogleAnalytics measurementId={settings.ga_measurement_id} />
       <TickerBar text={settings.ticker_text_en} />
       <SiteHeader locale="en" wa={wa} />

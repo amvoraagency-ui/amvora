@@ -4,6 +4,7 @@ import BackToTop from '@/components/BackToTop';
 import WaveDivider from '@/components/WaveDivider';
 import ConsultationCTA from '@/components/ConsultationCTA';
 import { fetchSiteContent } from '@/lib/content';
+import { safeJsonLd } from '@/lib/safeJsonLd';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,7 +29,7 @@ export default async function ContactPageEn() {
 
   return (
     <main className="min-h-screen bg-white">
-      {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
+      {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(faqSchema) }} />}
       <SiteHeader locale="en" wa={wa} />
 
       <section className="relative pt-16 pb-14 sm:pt-20 sm:pb-16 overflow-hidden bg-gradient-to-b from-[#fdf9ee] to-white text-center px-4 sm:px-6">

@@ -1,6 +1,6 @@
 export default function TickerBar({ text }) {
   if (!text) return null;
-  const single = Array(4).fill(text);
+  const single = Array(10).fill(text);
   const doubled = [...single, ...single];
   return (
     <div className="bg-navy text-[#f3e1b9] text-xs sm:text-sm py-2 overflow-hidden whitespace-nowrap border-b border-black/20">
@@ -11,7 +11,7 @@ export default function TickerBar({ text }) {
       </div>
       <style>{`
         .ticker-track {
-          animation: ticker-scroll 40s linear infinite;
+          animation: ticker-scroll 90s linear infinite;
         }
         @keyframes ticker-scroll {
           0% { transform: translateX(0%); }

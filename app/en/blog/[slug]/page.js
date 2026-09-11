@@ -8,6 +8,7 @@ import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import BackToTop from '@/components/BackToTop';
 import ConsultationCTA from '@/components/ConsultationCTA';
+import { safeJsonLd } from '@/lib/safeJsonLd';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,7 +70,7 @@ export default async function BlogPostEn({ params }) {
 
   return (
     <main className="min-h-screen bg-white" dir="ltr" lang="en">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(articleSchema) }} />
       <SiteHeader locale="en" wa={wa} />
 
       <article className="py-16 sm:py-20 max-w-3xl mx-auto px-4 sm:px-6">

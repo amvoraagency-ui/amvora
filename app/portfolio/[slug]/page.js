@@ -5,6 +5,7 @@ import { getPortfolioItemBySlug, getSettings } from '@/lib/db';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import BackToTop from '@/components/BackToTop';
+import { safeJsonLd } from '@/lib/safeJsonLd';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,7 +55,7 @@ export default async function PortfolioDetail({ params }) {
 
   return (
     <main className="min-h-screen bg-white">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(workSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(workSchema) }} />
       <SiteHeader locale="ar" wa={wa} />
 
       <article className="py-16 sm:py-20 max-w-4xl mx-auto px-4 sm:px-6">
