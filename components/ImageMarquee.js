@@ -9,20 +9,20 @@ export default function ImageMarquee({ items = [], locale = 'ar' }) {
 
   if (images.length === 0) {
     // Fallback: scrolling text badges. One dense block repeated twice (identical) for a seamless -50% loop.
-    const single = Array(6).fill(badges).flat();
+    const single = Array(12).fill(badges).flat();
     const doubled = [...single, ...single];
     return (
       <div className="bg-white border-y border-gray-200 py-4 sm:py-5 overflow-hidden">
         <div className="marquee-track flex items-center gap-3 sm:gap-4 w-max" dir="ltr">
           {doubled.map((b, i) => (
-            <span key={i} className="shrink-0 flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full border border-gray-200 bg-[#f6f1e6] text-[#8a6d1f] text-xs sm:text-sm font-bold whitespace-nowrap">
+            <span key={i} className="shrink-0 flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full border border-gray-200 bg-[#f6f1e6] text-[#8a6d1f] text-sm sm:text-base font-bold whitespace-nowrap">
               <i className="fa-solid fa-star text-[10px]" />
               {b}
             </span>
           ))}
         </div>
         <style>{`
-          .marquee-track { animation: marquee-scroll 90s linear infinite; }
+          .marquee-track { animation: marquee-scroll 200s linear infinite; }
           @keyframes marquee-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
           @media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }
         `}</style>
@@ -30,7 +30,7 @@ export default function ImageMarquee({ items = [], locale = 'ar' }) {
     );
   }
 
-  const single = Array(6).fill(images).flat();
+  const single = Array(10).fill(images).flat();
   const doubled = [...single, ...single];
 
   return (
@@ -43,7 +43,7 @@ export default function ImageMarquee({ items = [], locale = 'ar' }) {
         ))}
       </div>
       <style>{`
-        .marquee-track { animation: marquee-scroll 110s linear infinite; }
+        .marquee-track { animation: marquee-scroll 200s linear infinite; }
         .marquee-track:hover { animation-play-state: paused; }
         @keyframes marquee-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         @media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }
