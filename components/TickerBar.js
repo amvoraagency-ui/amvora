@@ -3,8 +3,8 @@ export default function TickerBar({ text }) {
   const single = Array(20).fill(text);
   const doubled = [...single, ...single];
   return (
-    <div className="bg-navy text-[#f8e9c2] text-sm sm:text-base font-bold py-2.5 overflow-hidden whitespace-nowrap border-b border-black/20 tracking-wide">
-      <div className="ticker-track inline-flex w-max" dir="ltr">
+    <div className="bg-navy text-[#f8e9c2] text-sm sm:text-base font-bold py-2.5 overflow-hidden whitespace-nowrap border-b border-black/20 tracking-wide" dir="ltr">
+      <div className="ticker-track inline-flex w-max">
         {doubled.map((t, i) => (
           <span key={i} className="mx-8">{t}</span>
         ))}

@@ -12,8 +12,8 @@ export default function ImageMarquee({ items = [], locale = 'ar' }) {
     const single = Array(12).fill(badges).flat();
     const doubled = [...single, ...single];
     return (
-      <div className="bg-white border-y border-gray-200 py-4 sm:py-5 overflow-hidden">
-        <div className="marquee-track flex items-center gap-3 sm:gap-4 w-max" dir="ltr">
+      <div className="bg-white border-y border-gray-200 py-4 sm:py-5 overflow-hidden" dir="ltr">
+        <div className="marquee-track flex items-center gap-3 sm:gap-4 w-max">
           {doubled.map((b, i) => (
             <span key={i} className="shrink-0 flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full border border-gray-200 bg-[#f6f1e6] text-[#8a6d1f] text-sm sm:text-base font-bold whitespace-nowrap">
               <i className="fa-solid fa-star text-[10px]" />
@@ -34,8 +34,8 @@ export default function ImageMarquee({ items = [], locale = 'ar' }) {
   const doubled = [...single, ...single];
 
   return (
-    <div className="bg-white border-y border-gray-200 py-5 sm:py-6 overflow-hidden">
-      <div className="marquee-track flex items-center gap-4 sm:gap-6 w-max" dir="ltr">
+    <div className="bg-white border-y border-gray-200 py-5 sm:py-6 overflow-hidden" dir="ltr">
+      <div className="marquee-track flex items-center gap-4 sm:gap-6 w-max">
         {doubled.map((item, i) => (
           <span key={i} className="shrink-0 w-40 h-24 sm:w-56 sm:h-32 rounded-2xl overflow-hidden border border-gray-200 shadow-md relative bg-gray-50 block">
             <img src={item.image_url} alt={item.title || ''} className="w-full h-full object-cover" />
