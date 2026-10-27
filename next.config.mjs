@@ -5,6 +5,12 @@ const nextConfig = {
       { protocol: 'https', hostname: '**' },
     ],
   },
+  async redirects() {
+    return [
+      { source: '/pricing', destination: '/contact', permanent: false },
+      { source: '/en/pricing', destination: '/en/contact', permanent: false },
+    ];
+  },
   async headers() {
     const csp = [
       "default-src 'self'",
@@ -12,7 +18,7 @@ const nextConfig = {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
       "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
       "img-src 'self' data: https:",
-      "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com",
+      "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://formsubmit.co",
       "frame-src 'self'",
       "form-action 'self' https://formsubmit.co",
     ].join('; ');

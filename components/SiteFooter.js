@@ -4,7 +4,7 @@ const T = {
   ar: {
     tagline: 'وكالة هندسة منصات رقمية مخصصة: مواقع تعريفية للمهنيين، عقارات، متاجر إلكترونية، وتكامل بوابات دفع.',
     quickLinks: 'روابط سريعة',
-    services: 'خدماتنا', portfolio: 'أعمالنا', about: 'من نحن', pricing: 'الباقات', blog: 'المدونة', contact: 'تواصل معنا',
+    services: 'خدماتنا', portfolio: 'أعمالنا', about: 'من نحن', blog: 'المدونة', contact: 'تواصل معنا', careers: 'انضم لينا',
     contactTitle: 'تواصل معنا', whatsapp: 'واتساب', contactForm: 'نموذج تواصل',
     follow: 'تابعنا', addLinks: 'أضف روابطك من لوحة التحكم',
     rights: 'جميع الحقوق محفوظة', privacy: 'سياسة الخصوصية', terms: 'الشروط والأحكام', admin: 'لوحة التحكم',
@@ -12,7 +12,7 @@ const T = {
   en: {
     tagline: 'A custom digital platform agency: profile sites for professionals, real estate, e-commerce, and payment gateway integration.',
     quickLinks: 'Quick Links',
-    services: 'Services', portfolio: 'Work', about: 'About', pricing: 'Pricing', blog: 'Blog', contact: 'Contact',
+    services: 'Services', portfolio: 'Work', about: 'About', blog: 'Blog', contact: 'Contact', careers: 'Join Us',
     contactTitle: 'Contact Us', whatsapp: 'WhatsApp', contactForm: 'Contact form',
     follow: 'Follow Us', addLinks: 'Add your links from the dashboard',
     rights: 'ALL RIGHTS RESERVED', privacy: 'Privacy Policy', terms: 'Terms & Conditions', admin: 'Admin',
@@ -39,9 +39,9 @@ export default function SiteFooter({ locale = 'ar', settings = {}, wa }) {
             <li><a href={`${p}/services`} className="hover:text-gold transition-colors">{t.services}</a></li>
             <li><a href={`${p}/portfolio`} className="hover:text-gold transition-colors">{t.portfolio}</a></li>
             <li><a href={`${p}/about`} className="hover:text-gold transition-colors">{t.about}</a></li>
-            <li><a href={`${p}/pricing`} className="hover:text-gold transition-colors">{t.pricing}</a></li>
             <li><a href={`${p}/blog`} className="hover:text-gold transition-colors">{t.blog}</a></li>
             <li><a href={`${p}/contact`} className="hover:text-gold transition-colors">{t.contact}</a></li>
+            <li><a href={`${p}/careers`} className="hover:text-gold transition-colors">{t.careers}</a></li>
           </ul>
         </div>
         <div>
